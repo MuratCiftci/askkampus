@@ -8,6 +8,7 @@ import { exampleRouter } from "~/server/api/routers/example";
  */
 export const appRouter = createTRPCRouter({
   example: exampleRouter,
+  community: communityRouter,
 });
 
 // export type definition of API

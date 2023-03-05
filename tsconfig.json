@@ -19,15 +19,15 @@
     "baseUrl": ".",
     "paths": {
       "~/*": ["./src/*"]
-    }
+    } 
   },
-  "include": [
+  "include": [ 
     ".eslintrc.cjs",
     "next-env.d.ts",
     "**/*.ts",
     "**/*.tsx",
     "**/*.cjs",
     "**/*.mjs"
-  ],
+, "tailwind.config.cjs "  ],
   "exclude": ["node_modules"]
 }

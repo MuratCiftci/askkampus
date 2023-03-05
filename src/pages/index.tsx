@@ -5,27 +5,31 @@ import { signIn, signOut, useSession } from "next-auth/react";
 
 import { api } from "~/utils/api";
 import HomeLayout from "~/components/layout/home";
+import { useToast } from "~/components/hooks/ui/use-toast";
 
 const Home: NextPage = () => {
   const hello = api.example.hello.useQuery({ text: "from tRPC" });
 
   const utils = api.useContext();
- 
 
-
+  const { toast } = useToast();
 
   const mutate = api.community.createCommunity.useMutation({
     onSuccess: async () => {
       await utils.community.getCommunities.invalidate();
+      toast({ title: "Community created", description: "You can now join it" });
     },
     onError: (err) => {
       console.log("err", err);
-    }
+      toast({
+        title: "Error",
+        description: err.message,
+        variant: "destructive",
+      });
+    },
   });
 
   const { data: communities } = api.community.getCommunities.useQuery();
-
-  console.log("communities", communities);
 
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -48,7 +52,10 @@ const Home: NextPage = () => {
           <AuthShowcase />
           <form onSubmit={handleSubmit}>
             <input type="text" name="name" />
-            <button type="submit" disabled={mutate.isLoading}>  Create community</button>
+            <button type="submit" disabled={mutate.isLoading}>
+              {" "}
+              Create community
+            </button>
           </form>
           show all communities (with invalidation)
           <ul>

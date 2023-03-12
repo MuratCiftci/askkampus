@@ -54,14 +54,14 @@ const Home: NextPage = () => {
             <input type="text" name="name" />
             <button type="submit" disabled={mutate.isLoading}>
               {" "}
-              Create community
+              Create Post 
             </button>
           </form>
           show all communities (with invalidation)
           <ul>
             {communities?.map((community) => (
               <li key={community.id}>
-                <Link href={`/community/${community.id}`}>
+                <Link href={`/community/${community.name}`}>
                   {community.name}
                 </Link>
               </li>

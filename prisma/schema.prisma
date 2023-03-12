@@ -86,7 +86,7 @@ model Post {
   updatedAt   DateTime           @updatedAt
   title       String
   body        String
-  image_url   String
+  image_url   String?
   community   Community          @relation(fields: [communityId], references: [id])
   communityId String
   user        User               @relation(fields: [userId], references: [id])
@@ -137,4 +137,9 @@ model CategoriesOnPost {
   postId     String
   category   Category @relation(fields: [categoryId], references: [id])
   categoryId String
+}
+
+enum Role {
+  ADMIN
+  USER
 }

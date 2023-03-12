@@ -67,4 +67,145 @@ export const postRouter = createTRPCRouter({
 
       return posts;
     }),
+
+  addComment: protectedProcedure
+    .input(z.object({ postId: z.string(), body: z.string() }))
+    .mutation(async ({ ctx, input }) => {
+      const comment = await ctx.prisma.comment.create({
+        data: {
+          body: input.body,
+          createdAt: new Date(),
+          updatedAt: new Date(),
+          post: {
+            connect: { id: input.postId },
+          },
+          user: {
+            connect: { id: ctx.session.user.id },
+          },
+        },
+      });
+
+      return comment;
+    }),
+
+  getComments: publicProcedure
+    .input(z.object({ postId: z.string() }))
+    .query(async ({ ctx, input }) => {
+      const comments = await ctx.prisma.comment.findMany({
+        where: {
+          postId: input.postId,
+        },
+        orderBy: {
+          createdAt: "asc",
+        },
+        select: {
+          id: true,
+          body: true,
+          createdAt: true,
+          updatedAt: true,
+          user: {
+            select: {
+              id: true,
+              name: true,
+              image: true,
+            },
+          },
+          replies: {
+            select: {
+              id: true,
+              body: true,
+              createdAt: true,
+              updatedAt: true,
+              user: {
+                select: {
+                  id: true,
+                  name: true,
+                  image: true,
+                },
+              },
+              children: {
+                select: {
+                  id: true,
+                  body: true,
+                  createdAt: true,
+                  updatedAt: true,
+                  user: {
+                    select: {
+                      id: true,
+                      name: true,
+                      image: true,
+                    },
+                  },
+                },
+                skip: 0,
+                take: 3,
+              },
+            },
+            skip: 0,
+            take: 3,
+          },
+        },
+      });
+
+      return comments;
+    }),
+
+  addReply: protectedProcedure
+    .input(z.object({ commentId: z.string(), body: z.string() }))
+    .mutation(async ({ ctx, input }) => {
+      const reply = await ctx.prisma.reply.create({
+        data: {
+          body: input.body,
+          comment: {
+            connect: {
+              id: input.commentId,
+            },
+          },
+          user: {
+            connect: {
+              id: ctx.session.user.id,
+            },
+          },
+          createdAt: new Date(),
+          updatedAt: new Date(),
+        },
+      });
+
+      return reply;
+    }),
+
+  addReplyToReply: protectedProcedure
+    .input(
+      z.object({
+        reply_id: z.string(),
+        body: z.string(),
+        comment_id: z.string(),
+      })
+    )
+    .mutation(async ({ ctx, input }) => {
+      const reply = ctx.prisma.reply.create({
+        data: {
+          body: input.body,
+          parent: {
+            connect: {
+              id: input.reply_id,
+            },
+          },
+          comment: {
+            connect: {
+              id: input.comment_id,
+            },
+          },
+          user: {
+            connect: {
+              id: ctx.session.user.id,
+            },
+          },
+          createdAt: new Date(),
+          updatedAt: new Date(),
+        },
+      });
+
+      return reply;
+    }),
 });

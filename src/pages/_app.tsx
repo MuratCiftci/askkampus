@@ -6,7 +6,8 @@ import { api } from "~/utils/api";
 
 import "~/styles/globals.css";
 import { Toaster } from "~/components/shared/ui/Toaster";
- 
+import HomeLayout from "~/components/layout/home";
+import { ThemeProvider } from "next-themes";
 
 const MyApp: AppType<{ session: Session | null }> = ({
   Component,
@@ -14,9 +15,12 @@ const MyApp: AppType<{ session: Session | null }> = ({
 }) => {
   return (
     <SessionProvider session={session}>
-      <Toaster />
-
-      <Component {...pageProps} />
+      <ThemeProvider attribute="class">
+        <Toaster />
+        <HomeLayout>
+          <Component {...pageProps} />
+        </HomeLayout>
+      </ThemeProvider>
     </SessionProvider>
   );
 };

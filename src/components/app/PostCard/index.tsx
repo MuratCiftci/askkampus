@@ -48,7 +48,7 @@ const utils = api.useContext();
         >
             <ArrowBigUp />
           </Button>
-          <span className="text-xs font-bold text-gray-500">  23  </span>
+          <span className="text-xs font-bold text-gray-500">  {post._count?.votes} </span>
 
           <Button
             variant="ghost"

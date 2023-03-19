@@ -7,11 +7,57 @@ import {
 } from "~/server/api/trpc";
 
 export const postRouter = createTRPCRouter({
-  getAllPosts: publicProcedure.query(async ({ ctx }) => {
-    const posts = await ctx.prisma.post.findMany();
+  getAllPosts: publicProcedure
+    .input(
+      z.object({
+        limit: z.number().min(1).max(100).nullish(),
+        cursor: z.string().nullish()
+      })
+    )
+    .query(async ({ ctx, input }) => {
+      const limit = input.limit ?? 10;
+      const take = limit + 1;
+      console.log(limit, 'limit')
+      console.log(take, 'take')
+      const postsCount = await ctx.prisma.post.count();
+      console.log(postsCount, 'postsCount')
+      const { cursor } = input;
+      const posts = await ctx.prisma.post.findMany({
+        take:  take,
+        include: {
+          community: {
+            select: {
+              name: true,
+            },
+          },
+          user: {
+            select: {
+              name: true,
+            },
+          },
+        },
+        cursor: cursor ? {  id: cursor } : undefined,
+        orderBy: {
+          createdAt: "desc",
+        },
+      });
 
-    return posts;
-  }),
+      let nextCursor: typeof cursor | undefined = undefined;
+      debugger
+      console.log(posts.length, 'posts')
+      console.log(limit, 'limit')
+      if (posts.length > limit) {
+        const nextItem = posts.pop();
+        console.log(nextItem, 'nextItem' )
+        nextCursor = nextItem?.id;
+      }
+
+      
+      return {
+        posts,
+        nextCursor,
+      };
+    }),
 
   getPostByIdAndCommunity: publicProcedure
     .input(z.object({ id: z.string(), community_name: z.string() }))
@@ -207,5 +253,32 @@ export const postRouter = createTRPCRouter({
       });
 
       return reply;
+    }),
+  upvotePost: protectedProcedure
+    .input(z.object({ postId: z.string() }))
+    .mutation(async ({ ctx, input }) => {
+      const post = await ctx.prisma.post.update({
+        where: {
+          id: input.postId,
+        },
+
+        data: {
+          voteCount: {
+            increment: 1,
+          },
+
+          votes: {
+            create: {
+              user: {
+                connect: {
+                  id: ctx.session.user.id,
+                },
+              },
+            },
+          },
+        },
+      });
+
+      return post;
     }),
 });

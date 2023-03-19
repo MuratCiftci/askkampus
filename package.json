@@ -22,6 +22,7 @@
     "@trpc/server": "^10.9.0",
     "class-variance-authority": "^0.4.0",
     "clsx": "^1.2.1",
+    "dayjs": "^1.11.7",
     "lucide-react": "^0.122.0",
     "next": "13.1.6",
     "next-auth": "^4.19.0",

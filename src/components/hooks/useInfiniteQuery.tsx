@@ -11,7 +11,7 @@ export default function useInfiniteScroll(
           callback();
         }
       },
-      { threshold: 1 }
+      { threshold: 1 , rootMargin: "200px 0px" }
     );
 
     const currentTarget = target.current;

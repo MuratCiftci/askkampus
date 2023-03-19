@@ -4,10 +4,13 @@ import Sidebar from "./Sidebar";
 
 const HomeLayout = ({ children }: { children: React.ReactNode }) => {
   return (
-    <main className="flex min-h-screen flex-col items-center justify-center pl-64 py-12">
+    <main>
+      
       <Navbar />
       <Sidebar />
-      {children}
+      <div className="flex min-h-screen flex-col items-center justify-center py-12 pl-64 z-1">
+        {children}
+      </div>
     </main>
   );
 };

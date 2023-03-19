@@ -16,7 +16,7 @@ const Navbar = () => {
   console.log(sessionData);
 
   return (
-    <header className="z-80 fixed top-0 left-0 mb-2 flex h-12 w-full flex-row items-center shadow-md">
+    <header className="z-50 fixed top-0 left-0 mb-2 flex h-12 w-full flex-row items-center shadow-md bg-white dark:bg-neutral-900 dark:shadow-lg">
       <div className="box-border inline-flex grow flex-row items-center px-5">
         <Link href="/" className="mx-auto w-64 pl-4 align-middle">
           <Image

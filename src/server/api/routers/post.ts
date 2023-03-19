@@ -11,19 +11,19 @@ export const postRouter = createTRPCRouter({
     .input(
       z.object({
         limit: z.number().min(1).max(100).nullish(),
-        cursor: z.string().nullish()
+        cursor: z.string().nullish(),
       })
     )
     .query(async ({ ctx, input }) => {
       const limit = input.limit ?? 10;
       const take = limit + 1;
-      console.log(limit, 'limit')
-      console.log(take, 'take')
+      console.log(limit, "limit");
+      console.log(take, "take");
       const postsCount = await ctx.prisma.post.count();
-      console.log(postsCount, 'postsCount')
+      console.log(postsCount, "postsCount");
       const { cursor } = input;
       const posts = await ctx.prisma.post.findMany({
-        take:  take,
+        take: take,
         include: {
           community: {
             select: {
@@ -35,24 +35,30 @@ export const postRouter = createTRPCRouter({
               name: true,
             },
           },
+
+          _count: {
+            select: {
+              votes: true,
+            },
+          },
         },
-        cursor: cursor ? {  id: cursor } : undefined,
+
+        cursor: cursor ? { id: cursor } : undefined,
         orderBy: {
           createdAt: "desc",
         },
       });
 
       let nextCursor: typeof cursor | undefined = undefined;
-      debugger
-      console.log(posts.length, 'posts')
-      console.log(limit, 'limit')
+      debugger;
+      console.log(posts.length, "posts");
+      console.log(limit, "limit");
       if (posts.length > limit) {
         const nextItem = posts.pop();
-        console.log(nextItem, 'nextItem' )
+        console.log(nextItem, "nextItem");
         nextCursor = nextItem?.id;
       }
 
-      
       return {
         posts,
         nextCursor,

@@ -30,7 +30,7 @@ export const Login = () => {
         <div className="grid gap-4 py-4 items-center">
           <div className="grid grid-cols-4 items-center gap-4">
             
-            <Button variant="outline" className="flex items-center justify-start col-span-3" onClick={ () => signIn() }> 
+            <Button variant="outline" className="flex items-center justify-start col-span-3" onClick={ () => signIn('google') }> 
               <GoogleIcon />
                <span className="ml-3">Google ile giriş yap</span>
             </Button>

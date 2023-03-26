@@ -12,28 +12,26 @@ type Props = {
   post: Post;
 };
 
-
-
 const PostCard = (props: Props) => {
   const { post } = props;
 
-const utils = api.useContext();
+  const [upvoteCount, setUpvoteCount] = React.useState(post._count?.votes);
+
+  const utils = api.useContext();
   const upvotePost = api.post.upvotePost.useMutation({
-    onSuccess: async () => {
-      await utils.post.getAllPosts.invalidate();
+    onSuccess: () => {
+      setUpvoteCount((upvoteCount) => upvoteCount + 1);
 
       toast({ title: "Post upvoted" });
-
     },
+    onError: (err) => {
+      toast({
+        title: "Error",
+        description: err.message,
+        variant: "destructive",
+      });
+    }
   });
-
-
-
-
-
-    
-
-
 
   return (
     <div className="relative mb-4 min-h-[300px] cursor-pointer rounded-sm border border-gray-300 border-opacity-50 p-2 pl-10 hover:border-opacity-100">
@@ -43,12 +41,16 @@ const utils = api.useContext();
             variant="ghost"
             size="sm"
             className="hover:bg-inherit hover:text-blue-500 dark:hover:bg-inherit dark:hover:text-blue-500"
-            onClick={() => { upvotePost.mutate({ postId: post.id }) }}
-        
-        >
+            onClick={() => {
+              upvotePost.mutate({ postId: post.id });
+            }}
+          >
             <ArrowBigUp />
           </Button>
-          <span className="text-xs font-bold text-gray-500">  {post._count?.votes} </span>
+          <span className="text-xs font-bold text-gray-500">
+            {" "}
+            {upvoteCount}{" "}
+          </span>
 
           <Button
             variant="ghost"
@@ -81,18 +83,17 @@ const utils = api.useContext();
 
         <div className="mx-4" />
         <Link href={`/p/${post.id}`}>
-            <h1 className="text-xl font-bold text-gray-800 dark:text-gray-200">
-                {post.title}
-            </h1>
+          <h1 className="text-xl font-bold text-gray-800 dark:text-gray-200">
+            {post.title}
+          </h1>
         </Link>
         <div className="mt-2">
-            <Link href={`/p/${post.id}`}>
-                <p className="text-sm text-gray-800 dark:text-gray-200">
-                    {post.body}
-                </p>
-            </Link>
-
-            </div>
+          <Link href={`/p/${post.id}`}>
+            <p className="text-sm text-gray-800 dark:text-gray-200">
+              {post.body}
+            </p>
+          </Link>
+        </div>
       </div>
     </div>
   );

@@ -7,6 +7,9 @@ export const getAllPosts = () => {
     },
     {
       getNextPageParam: (lastPage) => lastPage.nextCursor,
+      refetchOnWindowFocus: false,
+      refetchOnReconnect: false,
+      cacheTime: 1000 * 60 * 10 /* 10 minutes */,
     }
   );
 

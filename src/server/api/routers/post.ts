@@ -50,7 +50,6 @@ export const postRouter = createTRPCRouter({
       });
 
       let nextCursor: typeof cursor | undefined = undefined;
-      debugger;
       console.log(posts.length, "posts");
       console.log(limit, "limit");
       if (posts.length > limit) {

@@ -50,8 +50,6 @@ export const postRouter = createTRPCRouter({
       });
 
       let nextCursor: typeof cursor | undefined = undefined;
-      console.log(posts.length, "posts");
-      console.log(limit, "limit");
       if (posts.length > limit) {
         const nextItem = posts.pop();
         console.log(nextItem, "nextItem");
@@ -268,10 +266,6 @@ export const postRouter = createTRPCRouter({
         },
 
         data: {
-          voteCount: {
-            increment: 1,
-          },
-
           votes: {
             create: {
               user: {

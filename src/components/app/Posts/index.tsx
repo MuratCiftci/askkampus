@@ -9,7 +9,6 @@ const Posts = () => {
   const {
     data,
     error,
-    isLoading,
     fetchNextPage,
     hasNextPage,
     isFetching,

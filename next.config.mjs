@@ -20,5 +20,9 @@ const config = {
     locales: ["en"],
     defaultLocale: "en",
   },
+  images: {
+    domains: ["imagedelivery.net", "upload.wikimedia.org"],
+  },
 };
+
 export default config;

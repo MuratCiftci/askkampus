@@ -7,10 +7,11 @@ export type Post = {
   title: string;
   updatedAt: Date;
   userId: string;
-  community : {
-    name: string | null;
+  community: {
+    name: string;
+    image_url: string;
   };
-  user : {
+  user: {
     name: string | null;
   };
   _count: {

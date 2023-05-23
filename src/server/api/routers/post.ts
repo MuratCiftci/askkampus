@@ -28,6 +28,7 @@ export const postRouter = createTRPCRouter({
           community: {
             select: {
               name: true,
+               image_url: true,
             },
           },
           user: {

@@ -13,6 +13,7 @@ export type Post = {
   };
   user?: {
     name: string | null;
+    id: string;
   };
   _count?: {
     votes: number;

@@ -43,7 +43,7 @@ const Post = () => {
       <div className="align-start mx-auto flex w-full flex-row justify-end">
         <div className="w-full">
           <PostDetailCard post={post} />
-          {commentsLoading || comments?.length === 0 ? (
+          {commentsLoading ? (
             <div className="mt-4"> Loading... </div>
           ) : (
             <Comments comments={comments} />

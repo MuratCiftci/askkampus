@@ -27,7 +27,7 @@ const PostCard = (props: Props) => {
   const utils = api.useContext();
   const upvotePost = api.post.upvotePost.useMutation({
     onSuccess: () => {
-      setUpvoteCount((upvoteCount) =>  (upvoteCount ? upvoteCount + 1 : 1));
+      setUpvoteCount((upvoteCount) => (upvoteCount ? upvoteCount + 1 : 1));
 
       toast({ title: "Post upvoted" });
     },
@@ -83,10 +83,13 @@ const PostCard = (props: Props) => {
             >
               {post.community.name}
             </Link>
-            <span className="mx-1 cursor-pointer text-xs text-slate-500 hover:underline dark:text-slate-300 dark:hover:text-slate-200">
+            <Link
+              className="mx-1 cursor-pointer text-xs text-slate-500 hover:underline dark:text-slate-300 dark:hover:text-slate-200"
+              href={`/user/${post.user?.id || ""}`}
+            >
               {" "}
-              {post.user.name} tarafından paylaşıldı{" "}
-            </span>{" "}
+              {post.user?.name} tarafından paylaşıldı{" "}
+            </Link>{" "}
           </div>
           <div className="flex flex-col items-start text-xs text-slate-500 dark:text-slate-300">
             {getTimeDifference(post.createdAt)}

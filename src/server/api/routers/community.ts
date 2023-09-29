@@ -114,8 +114,24 @@ export const communityRouter = createTRPCRouter({
     return communities;
   }),
 
+  getCommunityNameAndIdAndImage: publicProcedure.query(async ({ ctx }) => {
+    const communities = await ctx.prisma.community.findMany({
+      select: {
+        id: true,
+        name: true,
+        image_url: true,
+      }
+    });
 
+    return communities;
+  }
+  ),
 });
+
+
+
+
+
 
 
 

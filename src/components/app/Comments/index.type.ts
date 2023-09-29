@@ -1,12 +1,12 @@
 export interface Comment {
     id: string;
     body: string;
-    createdAt: string;
-    updatedAt: string;
+    createdAt: Date;
+    updatedAt: Date;
     user: {
         id: string;
         name: string;
-        image: string;
+        image?: string;
     };
-    replies: Comment[];
+    replies?: Comment[];
 }

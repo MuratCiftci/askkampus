@@ -21,7 +21,7 @@ const config = {
     defaultLocale: "en",
   },
   images: {
-    domains: ["imagedelivery.net", "upload.wikimedia.org"],
+    domains: ["imagedelivery.net", "upload.wikimedia.org", "res.cloudinary.com", "picsum.photos"],
   },
 };
 

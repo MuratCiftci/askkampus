@@ -24,6 +24,7 @@
     "@trpc/react-query": "^10.9.0",
     "@trpc/server": "^10.9.0",
     "class-variance-authority": "^0.4.0",
+    "cloudinary": "^1.41.0",
     "clsx": "^1.2.1",
     "dayjs": "^1.11.7",
     "framer-motion": "^10.16.4",

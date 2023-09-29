@@ -34,6 +34,7 @@ export const postRouter = createTRPCRouter({
           user: {
             select: {
               name: true,
+              id: true,
             },
           },
 
@@ -83,6 +84,7 @@ export const postRouter = createTRPCRouter({
           user: {
             select: {
               name: true,
+              id: true,
             },
           },
 
@@ -99,25 +101,40 @@ export const postRouter = createTRPCRouter({
 
   createPost: protectedProcedure
     .input(
-      z.object({ title: z.string(), body: z.string(), community: z.string() })
+      z.object({ title: z.string(), body: z.string(), community: z.string(), image_url: z.string() })
     )
     .mutation(async ({ ctx, input }) => {
       const post = await ctx.prisma.post.create({
         data: {
           title: input.title,
           body: input.body,
+          image_url: input.image_url ?? "",
           createdAt: new Date(),
           updatedAt: new Date(),
           community: {
-            connect: { name: input.community },
+            connect: { id: input.community },
           },
           user: {
             connect: { id: ctx.session.user.id },
           },
         },
       });
+      // return community name 
+      const community = await ctx.prisma.community.findUnique({
+        where: {
+          id: input.community,
+        },
+        select: {
+          name: true,
+        },
+      });
 
-      return post;
+      const postWithCommunity = {
+        ...post,
+        community: community,
+      };
+
+      return postWithCommunity;
     }),
 
   getPostsByCommunity: publicProcedure
@@ -138,6 +155,7 @@ export const postRouter = createTRPCRouter({
           user: {
             select: {
               name: true,
+              id: true,
             },
           },
           _count: {

@@ -1,9 +1,10 @@
-import React, { useState } from "react";
+import React, { ChangeEvent, useState } from "react";
 import { PhoneOutgoingIcon, UserIcon } from "lucide-react";
 import { api } from "~/utils/api";
 import { toast } from "~/components/hooks/ui/use-toast";
 import { useRouter } from "next/router";
 import CommunityList from "./CommunityList";
+import cloudinary from "~/utils/cloudinaryConfig";
 
 type FormValues = {
   title: string;
@@ -14,15 +15,34 @@ const CreatePost = () => {
 
   const utils = api.useContext();
   const router = useRouter();
-  const mutate = api.community.createCommunity.useMutation({
+
+  const [selectedCommunity, setSelectedCommunity] = useState<
+    string | undefined
+  >("");
+  const [image, setImage] = useState("");
+  const [url, setUrl] = useState("");
+  const uploadImage = () => {
+    const data = new FormData();
+    data.append("file", image);
+    data.append("upload_preset", "jkrjhphh");
+    data.append("cloud_name", "doit2lcqj");
+    fetch("  https://api.cloudinary.com/v1_1/doit2lcqj/image/upload", {
+      method: "post",
+      body: data,
+    })
+      .then((resp) => resp.json())
+      .then((data) => {
+        setUrl(data.url);
+      })
+      .catch((err) => console.log(err));
+  };
+
+  const mutate = api.post.createPost.useMutation({
     onSuccess: async (data) => {
       toast({
-        title: "Topluluk oluşturuldu",
-        description: "Artık katılabilirsiniz",
+        title: "Post oluşturuldu",
       });
-      await router.push(`/community/${data.name}`);
-
-      await utils.community.getCommunities.invalidate();
+      await router.push(`/${data.community?.name || ""}/post/${data.id}`);
     },
 
     onError: (err) => {
@@ -40,12 +60,31 @@ const CreatePost = () => {
     const title = formData.get("community");
     const description = formData.get("description");
 
+    if (!title || !description) {
+      toast({
+        title: "Error",
+        description: "Lütfen tüm alanları doldurunuz.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    if (!selectedCommunity) {
+      toast({
+        title: "Error",
+        description: "Lütfen topluluk seçiniz.",
+        variant: "destructive",
+      });
+      return;
+    }
+
     if (typeof title !== "string" || typeof description !== "string") return;
 
     mutate.mutate({
-      name: title,
-      description: description,
-      image_url: "https://picsum.photos/200",
+      title: title,
+      body: description,
+      community: selectedCommunity,
+      image_url: url,
     });
   };
 
@@ -75,7 +114,10 @@ const CreatePost = () => {
                   Topluluk
                 </label>
 
-                <CommunityList community={data} />
+                <CommunityList
+                  community={data}
+                  setSelectedCommunity={setSelectedCommunity}
+                />
               </div>
               <div className="mt-2"></div>
 
@@ -122,17 +164,27 @@ const CreatePost = () => {
                   İçerik Fotoğrafı (Opsiyonel)
                 </label>
                 <div className="mt-2 flex items-center gap-x-3">
-                  <UserIcon
-                    className="h-12 w-12 text-gray-300"
-                    aria-hidden="true"
-                  />
+                  <input
+                    type="file"
+                    onChange={(e) => setImage(e.target.files[0])}
+                  ></input>
                   <button
+                    onClick={() => uploadImage()}
                     type="button"
                     className="rounded-md bg-white px-2.5 py-1.5 text-sm font-semibold text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50"
                   >
                     Ekle
                   </button>
                 </div>
+                {/* //display image */}
+                {url ? (
+                  <img
+                    className="mt-2"
+                    src={url}
+                    alt="post image"
+                    style={{ width: "300px", height: "300px" }}
+                  />
+                ) : null}
               </div>
             </div>
           </div>

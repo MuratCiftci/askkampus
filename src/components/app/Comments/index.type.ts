@@ -4,9 +4,9 @@ export interface Comment {
     createdAt: Date;
     updatedAt: Date;
     user: {
-        id: string;
-        name: string;
-        image?: string;
+        id: string | null;
+        name: string | null;
+        image?: string | null;
     };
     replies?: Comment[];
-}
+} 

@@ -19,19 +19,31 @@ const CreatePost = () => {
   const [selectedCommunity, setSelectedCommunity] = useState<
     string | undefined
   >("");
-  const [image, setImage] = useState("");
-  const [url, setUrl] = useState("");
-  const uploadImage = () => {
+  const [image, setImage] = useState<File | null>(null);
+  const [url, setUrl] = useState<string | null>(null);
+
+  const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.files && e.target.files.length > 0) {
+      const file = e.target.files[0];
+      setImage(file || null);
+      if (file) {
+        uploadImage(file);
+      }
+    }
+  };
+
+  const uploadImage = (imageFile: File) => {
     const data = new FormData();
-    data.append("file", image);
+    data.append("file", imageFile);
     data.append("upload_preset", "jkrjhphh");
     data.append("cloud_name", "doit2lcqj");
-    fetch("  https://api.cloudinary.com/v1_1/doit2lcqj/image/upload", {
+
+    fetch("https://api.cloudinary.com/v1_1/doit2lcqj/image/upload", {
       method: "post",
       body: data,
     })
       .then((resp) => resp.json())
-      .then((data) => {
+      .then((data: { url: string }) => {
         setUrl(data.url);
       })
       .catch((err) => console.log(err));
@@ -84,7 +96,7 @@ const CreatePost = () => {
       title: title,
       body: description,
       community: selectedCommunity,
-      image_url: url,
+      image_url: url || "",
     });
   };
 
@@ -166,15 +178,8 @@ const CreatePost = () => {
                 <div className="mt-2 flex items-center gap-x-3">
                   <input
                     type="file"
-                    onChange={(e) => setImage(e.target.files[0])}
+                    onChange={(e) => handleImageChange(e)}
                   ></input>
-                  <button
-                    onClick={() => uploadImage()}
-                    type="button"
-                    className="rounded-md bg-white px-2.5 py-1.5 text-sm font-semibold text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50"
-                  >
-                    Ekle
-                  </button>
                 </div>
                 {/* //display image */}
                 {url ? (

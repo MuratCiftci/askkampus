@@ -23,7 +23,7 @@ const CommentCard = ({ comment, isReply }: Props) => {
                 comment.user.image ||
                 "https://flowbite.com/docs/images/people/profile-picture-2.jpg"
               }
-              alt={comment.user.name}
+              alt={comment?.user.name || ""}
             />
             {comment.user.name}
           </p>
@@ -84,7 +84,7 @@ const CommentCard = ({ comment, isReply }: Props) => {
           setOpenReplyArea={setOpenReplyArea}
         />
       ) : null}
-      {comment.replies?.map((nestedComment) => (
+      {comment?.replies?.map((nestedComment) => (
         <>
           <CommentCard
             comment={nestedComment}

@@ -1,12 +1,12 @@
 export type Post = {
   body: string;
-  communityId: string;
+  communityId?: string;
   createdAt: Date;
   id: string;
   image_url?: string | null;
   title: string;
   updatedAt: Date;
-  userId: string;
+  userId?: string;
   community?: {
     name: string;
     image_url: string;

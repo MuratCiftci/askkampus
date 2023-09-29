@@ -21,16 +21,6 @@ const Posts = () => {
 
   useInfiniteScroll(loadMore, target);
 
-  const createP = () => {
-    const title = "Ege Üniversitesi Bilgisayar Mühendisliği";
-
-    const body = "Burası hakkında ne düşünüyorsunuz?";
-
-    const community = "EgeUniversitesi";
-
-    createPost.mutate({ title, body, community });
-  };
-
   if (status === "loading") {
     return <div>Loading...</div>;
   }
@@ -41,7 +31,6 @@ const Posts = () => {
 
   return (
     <div className="mt-4 w-full">
-      <Button onClick={createP}>Create Post</Button>
       {data?.pages.map((page, i) => {
         return (
           <div key={i}>

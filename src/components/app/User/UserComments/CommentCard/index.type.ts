@@ -13,7 +13,7 @@ export type CommentCardProps = {
         }
     },
     user: {
-        name: string;
-        id: string;
+        name: string | null;
+        id: string | null;
     }
 };

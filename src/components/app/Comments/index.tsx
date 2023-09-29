@@ -4,14 +4,14 @@ import { Comment } from "./index.type";
 import CommentArea from "./CommentArea";
 
 interface Props {
-  comments: Comment[];
+  comments: Comment[] | undefined;
 }
 
 const Comments = ({ comments }: Props) => {
   const [commentDropdown, setCommentDropdown] = React.useState(false);
-  const totalCommentsWithReplies = comments.reduce(
-    (acc, comment) => acc + comment.replies.length,
-    comments.length
+  const totalCommentsWithReplies = comments?.reduce(
+    (acc, comment) => acc + (comment.replies ? comment.replies.length : 0) + 1,
+    0
   );
 
   return (
@@ -22,8 +22,8 @@ const Comments = ({ comments }: Props) => {
             Yorumlar ({totalCommentsWithReplies})
           </h2>
         </div>
-        <CommentArea  commentType="comment" />
-        {comments.map((comment) => (
+        <CommentArea commentType="comment" />
+        {comments?.map((comment) => (
           <CommentCard comment={comment} key={comment.id} />
         ))}
       </div>

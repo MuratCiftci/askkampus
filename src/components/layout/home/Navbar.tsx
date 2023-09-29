@@ -14,7 +14,7 @@ const navigation = [
   { name: "Takvim", href: "#", current: false },
 ];
 
-function classNames(...classes) {
+function classNames(...classes: string[]) {
   return classes.filter(Boolean).join(" ");
 }
 
@@ -87,7 +87,7 @@ export default function Navbar() {
 
                         <img
                           className="h-10 w-10 rounded-full"
-                          src={data?.user.image}
+                          src={data?.user.image || ""}
                           alt="user"
                         />
                       </Menu.Button>

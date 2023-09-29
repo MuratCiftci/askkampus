@@ -27,6 +27,7 @@ export const postRouter = createTRPCRouter({
         include: {
           community: {
             select: {
+              id: true,
               name: true,
               image_url: true,
             },
@@ -65,18 +66,16 @@ export const postRouter = createTRPCRouter({
     }),
 
   getPostByIdAndCommunity: publicProcedure
-    .input(z.object({ id: z.string(), community_name: z.string() }))
+    .input(z.object({ id: z.string() }))
     .query(async ({ ctx, input }) => {
       const post = await ctx.prisma.post.findFirst({
         where: {
           id: input.id,
-          community: {
-            name: input.community_name,
-          },
         },
         include: {
           community: {
             select: {
+              id: true,
               name: true,
               image_url: true,
             },
@@ -138,12 +137,12 @@ export const postRouter = createTRPCRouter({
     }),
 
   getPostsByCommunity: publicProcedure
-    .input(z.object({ name: z.string() }))
+    .input(z.object({ id: z.string() }))
     .query(async ({ ctx, input }) => {
       const posts = await ctx.prisma.post.findMany({
         where: {
           community: {
-            name: input.name,
+            id: input.id,
           },
         },
         select: {
@@ -152,6 +151,8 @@ export const postRouter = createTRPCRouter({
           body: true,
           createdAt: true,
           updatedAt: true,
+          image_url: true,
+          communityId: true,
           user: {
             select: {
               name: true,
@@ -165,6 +166,7 @@ export const postRouter = createTRPCRouter({
           },
           community: {
             select: {
+              id: true,
               name: true,
               image_url: true,
             },
@@ -218,6 +220,16 @@ export const postRouter = createTRPCRouter({
               id: true,
               name: true,
               image: true,
+            },
+          },
+          post: {
+            include: {
+              community: {
+                select: {
+                  id: true,
+                  name: true,
+                },
+              },
             },
           },
           replies: {

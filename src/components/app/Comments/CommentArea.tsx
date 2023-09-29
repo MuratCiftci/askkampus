@@ -65,7 +65,6 @@ const CommentArea = ({
 
   const addReply = (e: React.FormEvent<HTMLFormElement>, id: string) => {
     e.preventDefault();
-    debugger;
     const formData = new FormData(e.currentTarget);
     const name = formData.get("comment");
     if (typeof name === "string") {
@@ -74,7 +73,6 @@ const CommentArea = ({
 
     e.currentTarget.reset();
   };
-  debugger;
 
   //   const addReplyToReply = (
   //     e: React.FormEvent<HTMLFormElement>,

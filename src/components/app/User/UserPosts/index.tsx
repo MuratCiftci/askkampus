@@ -2,6 +2,7 @@ import React from "react";
 import { api } from "~/utils/api";
 import PostCard from "../../PostCard";
 import Tabs from "~/components/shared/ui/Tabs";
+import { TabWithAnimation } from "~/components/shared/ui/TabWithAnimation";
 type UserPostsProps = {
   id: string;
   sortBy: "new" | "top";
@@ -22,22 +23,10 @@ const UserPosts = ({ id, sortBy }: UserPostsProps) => {
     return <div>Error</div>;
   }
 
-  const tabs = [
-    {
-      key: "new",
-      name: "Yeni",
-      path: `/user/${id}?type=posts&sort=new`,
-    },
-    {
-      key: "top",
-      name: "Popüler",
-      path: `/user/${id}?type=posts&sort=top`,
-    },
-  ];
+
 
   return (
     <>
-      <Tabs tabs={tabs} />
       {posts.map((post) => (
         <PostCard post={post} key={post.id} />
       ))}

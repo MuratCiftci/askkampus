@@ -13,12 +13,14 @@ import { api } from "~/utils/api";
 const Post = () => {
   const router = useRouter();
 
-  const { id, community } = router.query as { id: string; community: string };
+  const { id, community_id } = router.query as {
+    id: string;
+    community_id: string;
+  };
 
   // fetch post by id
 
   const { data: post, isLoading } = api.post.getPostByIdAndCommunity.useQuery({
-    community_name: community,
     id: id,
   });
 
@@ -37,6 +39,8 @@ const Post = () => {
     return <div>Post not found</div>;
   }
 
+  console.log(post, "post");
+
   return (
     <div className="w-full">
       <CommunityBanner community={post.community} />
@@ -49,7 +53,7 @@ const Post = () => {
             <Comments comments={comments} />
           )}
         </div>
-        <CommunityStatsCard name={post.community.name} />
+        <CommunityStatsCard id={post.communityId} />
       </div>
     </div>
   );

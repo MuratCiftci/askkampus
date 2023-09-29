@@ -60,11 +60,11 @@ export const communityRouter = createTRPCRouter({
 
   // get community posts length , image , name , description and total users
   getCommunityInfo: publicProcedure
-    .input(z.object({ name: z.string() }))
+    .input(z.object({ id: z.string() }))
     .query(async ({ ctx, input }) => {
       const community = await ctx.prisma.community.findUnique({
         where: {
-          name: input.name,
+          id: input.id,
         },
         include: {
           posts: {

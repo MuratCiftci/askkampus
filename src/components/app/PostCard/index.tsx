@@ -41,8 +41,10 @@ const PostCard = (props: Props) => {
     },
   });
 
+  console.log(post, "post");
+
   return (
-    <div className="container m-8 mb-8 flex max-w-lg transform flex-col rounded-xl bg-white p-4 shadow-lg duration-500 transition hover:scale-105 hover:shadow-2xl dark:bg-neutral-900">
+    <div className="container m-8 mb-8 flex max-w-lg transform flex-col rounded-xl bg-white p-4  drop-shadow-xl shadow-xl duration-500 transition hover:scale-105 hover:shadow-2xl dark:bg-neutral-900">
       <div className="flex items-center justify-between pb-4">
         <div className="flex w-10 flex-col items-center justify-center border-l border-transparent   pr-2">
           <div
@@ -79,7 +81,7 @@ const PostCard = (props: Props) => {
               className="mr-2 inline-block text-sm font-bold text-slate-900 hover:underline dark:text-slate-100
             
             "
-              href={`/community/${post?.community?.name || ""}`}
+              href={`/community/${post?.communityId || ""}`}
             >
               {post?.community?.name}
             </Link>
@@ -98,7 +100,7 @@ const PostCard = (props: Props) => {
       </div>
       <div className="p-4">
         <h5 className="text-blue-gray-900 mb-2 block font-sans text-xl font-semibold leading-snug tracking-normal antialiased">
-          <Link href={`${post?.community?.name || ""}/post/${post.id}`}>
+          <Link href={`/post/${post.id}`}>
             {post.title}
           </Link>
         </h5>
@@ -123,7 +125,7 @@ const PostCard = (props: Props) => {
       <div className="mt-4 border-t border-gray-200 dark:border-gray-700">
         <div className="divide-gray-200r flex divide-x divide-gray-200 dark:divide-gray-700 ">
           <Link
-            href={`${post?.community?.name || ""}/post/${post.id}`}
+            href={`/post/${post.id}`}
             className="block flex-1 px-3 py-4 text-center text-sm font-medium text-indigo-500 hover:bg-indigo-50 hover:text-indigo-600 dark:text-indigo-400 dark:hover:bg-indigo-900 dark:hover:text-indigo-300"
           >
             <div className="flex items-center justify-center rounded-md px-2 py-1 hover:bg-indigo-50 hover:text-indigo-600 dark:hover:bg-indigo-900 dark:hover:text-indigo-400">

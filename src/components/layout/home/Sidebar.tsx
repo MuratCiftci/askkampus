@@ -24,7 +24,7 @@ const Sidebar = ({ children }: { children: React.ReactNode }) => {
         className="group flex items-center rounded-lg p-2 text-gray-900 hover:bg-gray-100 dark:text-white dark:hover:bg-gray-700"
       >
         <Avatar src={community.image_url} size="small" />
-        <Link href={`/community/${community.name}`} className="ml-3">
+        <Link href={`/community/${community.id}`} className="ml-3">
           {community.name}
         </Link>
       </li>
@@ -60,7 +60,7 @@ const Sidebar = ({ children }: { children: React.ReactNode }) => {
 
       <aside
         id="sidebar-multi-level-sidebar"
-        className="fixed top-12 left-0 z-40 h-screen w-64 -translate-x-full transition-transform sm:translate-x-0"
+        className="fixed top-16 left-0 z-40 h-screen w-64 -translate-x-full transition-transform sm:translate-x-0"
         aria-label="Sidebar"
       >
         <div className="h-full overflow-y-auto bg-gray-50 px-3 py-16 dark:bg-gray-800">
@@ -131,7 +131,7 @@ const Sidebar = ({ children }: { children: React.ReactNode }) => {
                     />
                   </svg>
                   <span className="ml-3 flex-1 whitespace-nowrap">
-                    Sign Out
+                    Çıkış Yap
                   </span>
                 </span>
               </li>
@@ -160,7 +160,7 @@ const Sidebar = ({ children }: { children: React.ReactNode }) => {
                     onClick={() => void signIn()}
                     className="ml-3 flex-1 whitespace-nowrap"
                   >
-                    Sign In
+                    Giriş Yap
                   </span>
                 </a>
               </li>
@@ -169,7 +169,7 @@ const Sidebar = ({ children }: { children: React.ReactNode }) => {
         </div>
       </aside>
 
-      <div className="p-4 sm:ml-64">
+      <div className="mt-24 px-8 sm:ml-64">
         <div className="rounded-lg border-2 border-dashed border-gray-200 p-4 dark:border-gray-700">
           {children}
         </div>

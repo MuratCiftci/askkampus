@@ -77,7 +77,7 @@ const PostDetailCard = (props: Props) => {
             </div>
           </div>
           <h5 className="text-blue-gray-900 mb-2 block font-sans text-xl font-semibold leading-snug tracking-normal antialiased dark:text-white">
-            <Link href={`${post.community?.name || ""}/post/${post.id}`}>
+            <Link href={`/post/${post.id}`}>
               {post.title}
             </Link>
           </h5>

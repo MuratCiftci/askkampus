@@ -54,7 +54,7 @@ const CreatePost = () => {
       toast({
         title: "Post oluşturuldu",
       });
-      await router.push(`/${data.community?.name || ""}/post/${data.id}`);
+      await router.push(`/post/${data.id}`);
     },
 
     onError: (err) => {
@@ -65,6 +65,8 @@ const CreatePost = () => {
       });
     },
   });
+
+  console.log(url, "url");
 
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();

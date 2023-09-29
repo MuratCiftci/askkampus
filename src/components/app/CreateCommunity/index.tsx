@@ -9,16 +9,35 @@ type FormValues = {
   description: string;
 };
 const CreateCommunity = () => {
-  const { isLoading, data } = api.community.getCommunityNameAndId.useQuery();
-  const [selectedCommunity, setSelectedCommunity] = useState<string | null>("");
-  const [query, setQuery] = useState("");
+  const [image, setImage] = useState<File | null>(null);
+  const [url, setUrl] = useState<string | null>(null);
 
-  const filteredCommunities =
-    query === ""
-      ? data
-      : data?.filter((data) => {
-          return data.name.toLowerCase().includes(query.toLowerCase());
-        });
+  const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.files && e.target.files.length > 0) {
+      const file = e.target.files[0];
+      setImage(file || null);
+      if (file) {
+        uploadImage(file);
+      }
+    }
+  };
+
+  const uploadImage = (imageFile: File) => {
+    const data = new FormData();
+    data.append("file", imageFile);
+    data.append("upload_preset", "jkrjhphh");
+    data.append("cloud_name", "doit2lcqj");
+
+    fetch("https://api.cloudinary.com/v1_1/doit2lcqj/image/upload", {
+      method: "post",
+      body: data,
+    })
+      .then((resp) => resp.json())
+      .then((data: { url: string }) => {
+        setUrl(data.url);
+      })
+      .catch((err) => console.log(err));
+  };
 
   const utils = api.useContext();
   const router = useRouter();
@@ -28,7 +47,7 @@ const CreateCommunity = () => {
         title: "Topluluk oluşturuldu",
         description: "Artık katılabilirsiniz",
       });
-      await router.push(`/community/${data.name}`);
+      await router.push(`/community/${data.id}`);
 
       await utils.community.getCommunities.invalidate();
     },
@@ -48,21 +67,32 @@ const CreateCommunity = () => {
     const title = formData.get("community");
     const description = formData.get("description");
 
-    if (typeof title !== "string" || typeof description !== "string") return;
+    if (typeof title !== "string" || typeof description !== "string") {
+      toast({
+        title: "Error",
+        description: "Lütfen tüm alanları doldurunuz.",
+        variant: "destructive",
+      });
+      return;
+    }
+    if (!url) {
+      toast({
+        title: "Error",
+        description: "Lütfen bir fotoğraf yükleyiniz.",
+        variant: "destructive",
+      });
+      return;
+    }
 
     mutate.mutate({
       name: title,
       description: description,
-      image_url: "https://picsum.photos/200",
+      image_url: url,
     });
   };
 
-  if (isLoading) {
-    return <div>Loading...</div>;
-  }
-
   return (
-    <div className=" rounded-lg bg-slate-50 p-4 shadow-lg dark:bg-gray-800 dark:text-gray-100 mx-auto mt-12">
+    <div className=" bg-slate-50 mx-auto mt-12 rounded-lg p-4 shadow-lg dark:bg-gray-800 dark:text-gray-100">
       <form onSubmit={handleSubmit}>
         <div className="space-y-12">
           <div className="border-b border-gray-900/10 pb-12">
@@ -122,17 +152,20 @@ const CreateCommunity = () => {
                   Topluluk Fotoğrafı
                 </label>
                 <div className="mt-2 flex items-center gap-x-3">
-                  <UserIcon
-                    className="h-12 w-12 text-gray-300"
-                    aria-hidden="true"
-                  />
-                  <button
-                    type="button"
-                    className="rounded-md bg-white px-2.5 py-1.5 text-sm font-semibold text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50"
-                  >
-                    Change
-                  </button>
+                  <input
+                    type="file"
+                    onChange={(e) => handleImageChange(e)}
+                  ></input>
                 </div>
+                {/* //display image */}
+                {url ? (
+                  <img
+                    className="mt-2"
+                    src={url}
+                    alt="post image"
+                    style={{ width: "300px", height: "300px" }}
+                  />
+                ) : null}
               </div>
             </div>
           </div>
@@ -143,7 +176,7 @@ const CreateCommunity = () => {
             type="submit"
             className="rounded-md bg-indigo-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
           >
-             {mutate.isLoading ? "Oluşturuluyor..." : "Oluştur"}
+            {mutate.isLoading ? "Oluşturuluyor..." : "Oluştur"}
           </button>
         </div>
       </form>

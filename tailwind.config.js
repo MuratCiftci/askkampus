@@ -2,9 +2,10 @@
 const { spacing, fontFamily } = require("tailwindcss/defaultTheme");
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 const { nextui } = require("@nextui-org/react");
+const withMT = require("@material-tailwind/react/utils/withMT");
 
 /** @type {import('tailwindcss').Config} */
-module.exports = {
+module.exports = withMT({
   darkMode: "class",
   content: [
     "./src/**/*.{js,ts,jsx,tsx}",
@@ -120,5 +121,5 @@ module.exports = {
     typography: ["dark"],
   },
   // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-  plugins: [nextui()],
-};
+  plugins: [nextui(), require("@tailwindcss/forms")],
+});

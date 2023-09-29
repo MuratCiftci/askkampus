@@ -37,7 +37,7 @@ const CommentCard = ({ comment }: Props) => {
           <button
             onClick={() =>
               void router.push(
-                `/${comment.post.community.name || ""}/post/${comment.post.id || ""}`
+                `/post/${comment.post.id || ""}`
               )
             }
             className="cursor-pointer rounded-lg border py-2 px-8 text-center text-xs leading-tight duration-150 ease-in-out transition-colors hover:border-gray-500 hover:bg-gray-100 hover:text-gray-500 dark:hover:border-gray-400 dark:hover:bg-gray-800 dark:hover:text-gray-400"

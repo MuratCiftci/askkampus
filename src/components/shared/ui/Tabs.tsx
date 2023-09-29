@@ -7,13 +7,13 @@ type Props = {
     key: string;
     name: string;
     path: string;
+    isDefault?: boolean;
   }[];
 };
 
 const Tabs = ({ tabs }: Props) => {
   const router = useRouter();
-  const { type } = router.query as { type: string };
-  console.log(type);
+  const { sort } = router.query as { sort: string };
   return (
     <div className="border-b border-gray-200 text-center text-md font-medium text-gray-500 dark:border-gray-700 dark:text-gray-400">
       <ul className="-mb-px flex flex-wrap">
@@ -22,8 +22,8 @@ const Tabs = ({ tabs }: Props) => {
             <Link
               href={tab.path}
               className={`inline-block rounded-t-lg border-b-2 border-transparent p-4 hover:border-gray-300 hover:text-gray-600 dark:hover:text-gray-300 ${
-                tab.key === type
-                  ? "border-primary-500 text-primary-600 dark:text-primary-400"
+                tab.key === sort || tab.isDefault
+                  ?  "border-indigo-700 text-indigo-600 dark:text-indigo-400"
                   : ""
               }`}
             >

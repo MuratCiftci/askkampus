@@ -3,17 +3,18 @@ import Link from "next/link";
 import React from "react";
 import { api } from "~/utils/api";
 type Props = {
-  name: string;
+  id: string;
 };
-const CommunityStatsCard = ({ name }: Props) => {
+const CommunityStatsCard = ({ id }: Props) => {
   const { isLoading, data: community } =
     api.community.getCommunityInfo.useQuery({
-      name: name,
+      id: id,
     });
 
   if (isLoading) {
     return <div>Loading...</div>;
   }
+
 
   return (
     <div className="min-w-3xl mt-12 flex w-1/4 items-start justify-center px-8">
@@ -46,7 +47,7 @@ const CommunityStatsCard = ({ name }: Props) => {
           <div className="my-3 text-center">
             <Link
               className="text-xs font-medium italic text-indigo-500 hover:text-indigo-600 hover:underline"
-              href={`/community/${community?.name || ""}`}
+              href={`/community/${community?.id || ""}`}
             >
               Topluluğa Git
             </Link>

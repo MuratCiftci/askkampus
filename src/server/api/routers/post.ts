@@ -28,7 +28,7 @@ export const postRouter = createTRPCRouter({
           community: {
             select: {
               name: true,
-               image_url: true,
+              image_url: true,
             },
           },
           user: {
@@ -73,6 +73,25 @@ export const postRouter = createTRPCRouter({
             name: input.community_name,
           },
         },
+        include: {
+          community: {
+            select: {
+              name: true,
+              image_url: true,
+            },
+          },
+          user: {
+            select: {
+              name: true,
+            },
+          },
+
+          _count: {
+            select: {
+              votes: true,
+            },
+          },
+        },
       });
 
       return post;
@@ -108,6 +127,29 @@ export const postRouter = createTRPCRouter({
         where: {
           community: {
             name: input.name,
+          },
+        },
+        select: {
+          id: true,
+          title: true,
+          body: true,
+          createdAt: true,
+          updatedAt: true,
+          user: {
+            select: {
+              name: true,
+            },
+          },
+          _count: {
+            select: {
+              votes: true,
+            },
+          },
+          community: {
+            select: {
+              name: true,
+              image_url: true,
+            },
           },
         },
         orderBy: {

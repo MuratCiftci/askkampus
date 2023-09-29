@@ -6,14 +6,8 @@ import { Button } from "~/components/shared/ui/Button";
 import useInfiniteScroll from "~/components/hooks/useInfiniteQuery";
 
 const Posts = () => {
-  const {
-    data,
-    error,
-    fetchNextPage,
-    hasNextPage,
-    isFetching,
-    status,
-  } = getAllPosts();
+  const { data, error, fetchNextPage, hasNextPage, isFetching, status } =
+    getAllPosts();
 
   const createPost = api.post.createPost.useMutation();
 
@@ -57,7 +51,7 @@ const Posts = () => {
           </div>
         );
       })}
-      {hasNextPage ? (  <div ref={target} className="h-10" />) : null}
+      {hasNextPage ? <div ref={target} className="h-10" /> : null}
       {/* Infinite Scroll */}
       {isFetching ? <div>Loading...</div> : null}
     </div>

@@ -8,6 +8,7 @@ import { Button } from "~/components/shared/ui/Button";
 import { Login } from "~/components/app/Login";
 import { Signup } from "~/components/app/Signup";
 import { signOut, useSession } from "next-auth/react";
+import { Avatar } from "@nextui-org/react";
 
 const Navbar = () => {
   const { theme, setTheme } = useTheme();
@@ -16,7 +17,7 @@ const Navbar = () => {
   console.log(sessionData);
 
   return (
-    <header className="z-50 fixed top-0 left-0 mb-2 flex h-12 w-full flex-row items-center shadow-md bg-white dark:bg-neutral-900 dark:shadow-lg">
+    <header className="fixed top-0 left-0 z-50 mb-2 flex h-12 w-full flex-row items-center bg-white shadow-md dark:bg-neutral-900 dark:shadow-lg">
       <div className="box-border inline-flex grow flex-row items-center px-5">
         <Link href="/" className="mx-auto w-64 pl-4 align-middle">
           <Image
@@ -36,9 +37,12 @@ const Navbar = () => {
         </div>
         <div className=" margin mx-auto ml-5 inline-flex flex-row items-center gap-2">
           {sessionData && sessionData.user ? (
-            <>{sessionData?.user.name}
-            
-            <Button variant="outline" size="sm" onClick={() => signOut()}>Logout</Button>
+            <>
+              {sessionData?.user.name}
+
+              <Button variant="outline" size="sm" onClick={() => signOut()}>
+                Çıkış Yap
+              </Button>
             </>
           ) : (
             <>

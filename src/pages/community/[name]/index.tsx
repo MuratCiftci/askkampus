@@ -6,67 +6,70 @@ import { api } from "~/utils/api";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
 import Link from "next/link";
+import PostCard from "~/components/app/PostCard";
+import CommunityStatsCard from "~/components/app/CommunityStatsCard";
+import CommunityBanner from "~/components/app/CommunityBanner";
+import NoFound from "~/components/app/NoFound";
 
 type FormValues = {
   title: string;
-  body: string;
+  description: string;
 };
 
 const Community = () => {
   const router = useRouter();
   const { name } = router.query as { name: string };
 
-  // get community by id
-
-  const { data: community, isLoading } = api.community.getCommunity.useQuery({
-    name: name,
-  });
-
   const utils = api.useContext();
 
-  const mutate = api.post.createPost.useMutation({
-    onSuccess: async (data) => {
-      toast({ title: "Post created", description: "You can now join it" });
-      //await router.push(`/${data.communityId}/post/${data.id}`);
+  // const mutate = api.post.createPost.useMutation({
+  //   onSuccess: async (data) => {
+  //     toast({ title: "Post created", description: "You can now join it" });
+  //     //await router.push(`/${data.communityId}/post/${data.id}`);
 
-      await utils.post.getPostsByCommunity.invalidate({ name: name });
-    },
+  //     await utils.post.getPostsByCommunity.invalidate({ name: name });
+  //   },
 
-    onError: (err) => {
-      toast({
-        title: "Error",
-        description: err.message,
-        variant: "destructive",
-      });
-    },
-  });
+  //   onError: (err) => {
+  //     toast({
+  //       title: "Error",
+  //       description: err.message,
+  //       variant: "destructive",
+  //     });
+  //   },
+  // });
 
-  const schema = z.object({
-    title: z.string().min(3).max(255),
-    body: z.string().min(3).max(255),
-  });
+  // const schema = z.object({
+  //   title: z.string().min(3).max(255),
+  //   body: z.string().min(3).max(255),
+  // });
 
-  const {
-    register,
-    handleSubmit,
-    formState: { errors },
-  } = useForm<FormValues>({
-    defaultValues: {
-      title: "",
-      body: "",
-    },
-    resolver: zodResolver(schema),
-  });
+  // const {
+  //   register,
+  //   handleSubmit,
+  //   formState: { errors },
+  // } = useForm<FormValues>({
+  //   defaultValues: {
+  //     title: "",
+  //     body: "",
+  //   },
+  //   resolver: zodResolver(schema),
+  // });
 
-  const onSubmit: SubmitHandler<FormValues> = (data) => {
-    const { title, body } = data;
+  // const onSubmit: SubmitHandler<FormValues> = (data) => {
+  //   const { title, description } = data;
 
-    mutate.mutate({ title, body, community: name });
-  };
+  //   mutate.mutate({ title,  description: description,
+  // };
 
   const { data: posts, isError } = api.post.getPostsByCommunity.useQuery({
     name: name,
   });
+
+  const { data: community, isLoading } =
+    api.community.getCommunityInfo.useQuery({
+      name: name,
+    });
 
   if (isError) {
     return <div>Error</div>;
@@ -76,31 +79,31 @@ const Community = () => {
     return <div>Loading...</div>;
   }
 
-  console.log("posts", posts);
+  const communityBanner = {
+    name: community?.name || "",
+    image_url: community?.image_url || "",
+  };
 
   return (
-    // eslint-disable-next-line @typescript-eslint/no-misused-promises
-    <form onSubmit={handleSubmit(onSubmit)}>
-      <input type="text" {...register("title")} />
-      {errors.title && <p>{errors.title.message}</p>}
-      <input type="text" {...register("body")} />
-      {errors.body && <p>{errors.body.message}</p>}
-      <button type="submit" disabled={mutate.isLoading}>
-        Submit
-      </button>
-
-      {posts?.map((post) => (
-        <Link href={`/${name}/post/${post.id}`} key={post.id}>
-          <div className="flex flex-col gap-2 items-center align-center justify-center w-full cursor-pointer">
-            <div className="flex flex-row gap-2 align-center border-2 border-gray-200 p-2 rounded-md w-1/4">
-              <h1 className="text-2xl font-bold">{post.title}</h1>
-              <p className="text-lg">{post.body}</p>
-             
-            </div>
-          </div>
-        </Link>
-      ))}
-    </form>
+    <div className="h-full w-full">
+      <CommunityBanner community={communityBanner} />
+      <div className=" flex flex-row items-start justify-start">
+        <div className=" container flex flex-col items-start justify-start">
+          {posts?.length === 0 ? (
+            <NoFound />
+          ) : (
+            posts?.map((post) => (
+              <Link href={`/${name}/post/${post.id}`} key={post.id}>
+                <div className="align-center flex w-full cursor-pointer flex-col items-center justify-center gap-2">
+                  <PostCard post={post} />
+                </div>
+              </Link>
+            ))
+          )}
+        </div>
+        <CommunityStatsCard name={name} />
+      </div>
+    </div>
   );
 };
 

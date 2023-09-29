@@ -7,14 +7,14 @@ export type Post = {
   title: string;
   updatedAt: Date;
   userId: string;
-  community: {
+  community?: {
     name: string;
     image_url: string;
   };
-  user: {
+  user?: {
     name: string | null;
   };
-  _count: {
+  _count?: {
     votes: number;
   };
 };

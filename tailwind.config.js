@@ -1,10 +1,18 @@
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 const { spacing, fontFamily } = require("tailwindcss/defaultTheme");
+// eslint-disable-next-line @typescript-eslint/no-var-requires
+const { nextui } = require("@nextui-org/react");
 
 /** @type {import('tailwindcss').Config} */
 module.exports = {
   darkMode: "class",
-  content: ["./src/**/*.{js,ts,jsx,tsx}"],
+  content: [
+    "./src/**/*.{js,ts,jsx,tsx}",
+    "./pages/**/*.{js,ts,jsx,tsx}",
+    "./components/**/*.{js,ts,jsx,tsx}",
+    "./layouts/**/*.{js,ts,jsx,tsx}",
+    "./node_modules/@nextui-org/theme/dist/**/*.{js,ts,jsx,tsx}",
+  ],
   theme: {
     extend: {
       colors: {
@@ -112,6 +120,5 @@ module.exports = {
     typography: ["dark"],
   },
   // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-  // @ts-ignore
-  plugins: [require("tailwindcss-animate")],
+  plugins: [nextui()],
 };

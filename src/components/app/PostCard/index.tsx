@@ -79,9 +79,9 @@ const PostCard = (props: Props) => {
               className="mr-2 inline-block text-sm font-bold text-slate-900 hover:underline dark:text-slate-100
             
             "
-              href={`/${post.community.name}`}
+              href={`/community/${post.community?.name || ""}`}
             >
-              {post.community.name}
+              {post.community?.name}
             </Link>
             <Link
               className="mx-1 cursor-pointer text-xs text-slate-500 hover:underline dark:text-slate-300 dark:hover:text-slate-200"

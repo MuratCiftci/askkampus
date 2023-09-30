@@ -232,6 +232,36 @@ export const userRouter = createTRPCRouter({
             return user;
         }),
 
+    // delete my own comment 
+    deleteComment: protectedProcedure
+        .input(z.object({ id: z.string() }))
+        .mutation(async ({ ctx, input }) => {
+            const comment = await ctx.prisma.comment.findUnique({
+                where: {
+                    id: input.id,
+                },
+                select: {
+                    userId: true,
+                },
+            });
+
+            if (!comment) {
+                throw new Error("Comment not found");
+            }
+
+            if (comment.userId !== ctx.session.user.id) {
+                throw new Error("Bu yorum size ait değil");
+            }
+
+            const deletedComment = await ctx.prisma.comment.delete({
+                where: {
+                    id: input.id,
+                },
+            });
+
+            return deletedComment;
+        }),
+
 });
 
 

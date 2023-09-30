@@ -1,3 +1,4 @@
+import dayjs from "dayjs";
 import { z } from "zod";
 
 import {
@@ -5,6 +6,14 @@ import {
   publicProcedure,
   protectedProcedure,
 } from "~/server/api/trpc";
+
+import utc from "dayjs/plugin/utc";
+import timezone from "dayjs/plugin/timezone";
+
+dayjs.extend(utc);
+dayjs.extend(timezone);
+
+dayjs.tz.setDefault('Europe/Istanbul');  
 
 export const communityRouter = createTRPCRouter({
   hello: publicProcedure
@@ -231,18 +240,31 @@ export const communityRouter = createTRPCRouter({
         description: z.string(),
         location: z.string(),
         communityId: z.string(),
-        date:  z.string(),
+        date: z.string(),
         time: z.string(),
       })
     )
     .mutation(async ({ ctx, input }) => {
+      // date with time 
+      // const date = dayjs(input.date).toDate();
+      // const time = dayjs(input.time).toDate();
+
+      const date = dayjs(input.date);
+      console.log("date", date);
+      const hour = input.time.split(":")[0];
+      const minute = input.time.split(":")[1];
+      console.log("hour", hour, "minute", minute);
+      const dateTime = date.hour(parseInt(hour || "0")).minute(parseInt(minute || "0")).tz("Europe/Istanbul").toDate();
+
+      console.log("dateTime", dateTime);
+
 
       const createdEvent = await ctx.prisma.event.create({
         data: {
           name: input.name,
           description: input.description,
           location: input.location,
-          date: input.date,
+          date: dateTime,
           time: input.time,
           community: {
             connect: { id: input.communityId }, // Connect the event to the community.

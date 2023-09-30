@@ -1,57 +1,164 @@
 import React from "react";
+import dayjs from "dayjs";
+
+dayjs.locale("tr");
+import customParseFormat from "dayjs/plugin/customParseFormat";
+import updateLocale from "dayjs/plugin/updateLocale";
+import Back from "~/components/shared/icons/Back";
+import Forward from "~/components/shared/icons/Forward";
+import DayCard from "./DayCard";
+import { api } from "~/utils/api";
+
+const WeekDays = [
+  "Pazartesi",
+  "Salı",
+  "Çarşamba",
+  "Perşembe",
+  "Cuma",
+  "Cumartesi",
+  "Pazar",
+];
+
+dayjs.extend(customParseFormat);
+dayjs.extend(updateLocale);
+
+dayjs.updateLocale("en", {
+  weekStart: 1, // Monday as the first day of the week
+});
 
 const Calendar = () => {
+  const [date, setDate] = React.useState(new Date());
+
+  const { isLoading, data: events } = api.event.getSelectedMonthEvents.useQuery(
+    {
+      month: dayjs(date).month() + 1,
+      year: dayjs(date).year(),
+    }
+  );
+
+  const currentYear = dayjs(date).year();
+  const currentMonth = dayjs(date).month();
+  const daysInCurrentMonth = dayjs(date).daysInMonth();
+
+  const firstDayOfWeek = dayjs(`${currentYear}-${currentMonth + 1}-1`);
+  const lastDayOfWeek = dayjs(
+    `${currentYear}-${currentMonth + 1}-${daysInCurrentMonth}`
+  );
+  const firstWeekDay = firstDayOfWeek.day() === 0 ? 7 : firstDayOfWeek.day();
+  const lastWeekDay = lastDayOfWeek.day();
+
+  const getDay = (dayNumber: number, daysToAdd: number) => {
+    return firstDayOfWeek
+      .add(daysToAdd - firstWeekDay + dayNumber, "day")
+      .date();
+  };
+
+  const dayBeforeFirstDayOfLastWeek = lastDayOfWeek
+    .subtract(lastWeekDay, "day")
+    .date();
+
+  // add 28 days to first day of week to day before first day of last week
+  const midWeekLength = dayBeforeFirstDayOfLastWeek === getDay(7, 21) ? 3 : 4;
+
+  const renderFadedDays = () => {
+    const days: JSX.Element[] = [];
+    if (firstWeekDay === 0) return days;
+    for (let i = 1; i < firstWeekDay; i++) {
+      const day = firstDayOfWeek.subtract(firstWeekDay - i, "day").date();
+
+      days.push(
+        <DayCard
+          key={day}
+          day={day}
+          disabled
+          month={currentMonth + 1}
+          year={currentYear}
+        />
+      );
+    }
+    return days;
+  };
+
+  const renderLastWeekDays = () => {
+    const days = [] as JSX.Element[];
+    if (lastWeekDay === 0) return days;
+    for (let i = 1; i < lastWeekDay + 1; i++) {
+      const day = lastDayOfWeek.subtract(lastWeekDay - i, "day").date();
+      const isToday = dayjs().date() === day;
+      const eventsData = events?.filter(
+        (item) =>
+          dayjs(item.date).date() === day &&
+          dayjs(item.date).month() === currentMonth &&
+          dayjs(item.date).year() === currentYear
+      );
+      if (eventsData?.length) {
+        days.push(
+          <DayCard
+            key={day}
+            day={day}
+            events={eventsData}
+            isToday={isToday}
+            month={currentMonth + 1}
+            year={currentYear}
+          />
+        );
+        continue;
+      }
+      days.push(
+        <DayCard
+          key={day}
+          day={day}
+          isToday={isToday}
+          month={currentMonth + 1}
+          year={currentYear}
+        />
+      );
+    }
+    return days;
+  };
+
+  const renderNextMonthWeekDays = () => {
+    return (
+      lastWeekDay !== 7 &&
+      Array.from({ length: 7 - lastWeekDay }).map((_, index) => {
+        const day = lastDayOfWeek.add(index + 1, "day").date();
+
+        return (
+          <DayCard
+            key={day}
+            day={day}
+            disabled
+            month={currentMonth + 1}
+            year={currentYear}
+          />
+        );
+      })
+    );
+  };
+
   return (
     <div className="container mx-auto mt-10">
       <div className="wrapper w-full rounded bg-white shadow ">
         <div className="header flex justify-between border-b p-2">
-          <span className="text-lg font-bold">2020 July</span>
+          <span className="text-lg font-bold">
+            {dayjs(date).format("MMMM YYYY")}
+          </span>
           <div className="buttons">
-            <button className="p-1">
-              <svg
-                width="1em"
-                fill="gray"
-                height="1em"
-                viewBox="0 0 16 16"
-                className="bi bi-arrow-left-circle"
-                xmlns="http://www.w3.org/2000/svg"
-              >
-                <path
-                  fillRule="evenodd"
-                  d="M8 15A7 7 0 1 0 8 1a7 7 0 0 0 0 14zm0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16z"
-                />
-                <path
-                  fillRule="evenodd"
-                  d="M8.354 11.354a.5.5 0 0 0 0-.708L5.707 8l2.647-2.646a.5.5 0 1 0-.708-.708l-3 3a.5.5 0 0 0 0 .708l3 3a.5.5 0 0 0 .708 0z"
-                />
-                <path
-                  fillRule="evenodd"
-                  d="M11.5 8a.5.5 0 0 0-.5-.5H6a.5.5 0 0 0 0 1h5a.5.5 0 0 0 .5-.5z"
-                />
-              </svg>
+            <button
+              className="p-1"
+              onClick={() =>
+                setDate(new Date(date.getFullYear(), date.getMonth() - 1, 1))
+              }
+            >
+              <Back />
             </button>
-            <button className="p-1">
-              <svg
-                width="1em"
-                fill="gray"
-                height="1em"
-                viewBox="0 0 16 16"
-                className="bi bi-arrow-right-circle"
-                xmlns="http://www.w3.org/2000/svg"
-              >
-                <path
-                  fillRule="evenodd"
-                  d="M8 15A7 7 0 1 0 8 1a7 7 0 0 0 0 14zm0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16z"
-                />
-                <path
-                  fillRule="evenodd"
-                  d="M7.646 11.354a.5.5 0 0 1 0-.708L10.293 8 7.646 5.354a.5.5 0 1 1 .708-.708l3 3a.5.5 0 0 1 0 .708l-3 3a.5.5 0 0 1-.708 0z"
-                />
-                <path
-                  fillRule="evenodd"
-                  d="M4.5 8a.5.5 0 0 1 .5-.5h5a.5.5 0 0 1 0 1H5a.5.5 0 0 1-.5-.5z"
-                />
-              </svg>
+            <button
+              className="p-1"
+              onClick={() =>
+                setDate(new Date(date.getFullYear(), date.getMonth() + 1, 1))
+              }
+            >
+              <Forward />
             </button>
           </div>
         </div>
@@ -60,375 +167,149 @@ const Calendar = () => {
             <tr>
               <th className="lg:w-30 md:w-30 h-10 w-10 border-r p-2 text-xs sm:w-20 xl:w-40 xl:text-sm">
                 <span className="hidden sm:block md:block lg:block xl:block">
-                  Sunday
+                  Pazartesi
                 </span>
                 <span className="block sm:hidden md:hidden lg:hidden xl:hidden">
-                  Sun
+                  Paz
+                </span>
+              </th>
+
+              <th className="lg:w-30 md:w-30 h-10 w-10 border-r p-2 text-xs sm:w-20 xl:w-40 xl:text-sm">
+                <span className="hidden sm:block md:block lg:block xl:block">
+                  Salı
+                </span>
+                <span className="block sm:hidden md:hidden lg:hidden xl:hidden">
+                  Sal
                 </span>
               </th>
               <th className="lg:w-30 md:w-30 h-10 w-10 border-r p-2 text-xs sm:w-20 xl:w-40 xl:text-sm">
                 <span className="hidden sm:block md:block lg:block xl:block">
-                  Monday
+                  Çarşamba
                 </span>
                 <span className="block sm:hidden md:hidden lg:hidden xl:hidden">
-                  Mon
+                  Çar
                 </span>
               </th>
               <th className="lg:w-30 md:w-30 h-10 w-10 border-r p-2 text-xs sm:w-20 xl:w-40 xl:text-sm">
                 <span className="hidden sm:block md:block lg:block xl:block">
-                  Tuesday
+                  Perşembe
                 </span>
                 <span className="block sm:hidden md:hidden lg:hidden xl:hidden">
-                  Tue
+                  Per
                 </span>
               </th>
               <th className="lg:w-30 md:w-30 h-10 w-10 border-r p-2 text-xs sm:w-20 xl:w-40 xl:text-sm">
                 <span className="hidden sm:block md:block lg:block xl:block">
-                  Wednesday
+                  Cuma
                 </span>
                 <span className="block sm:hidden md:hidden lg:hidden xl:hidden">
-                  Wed
+                  Cum
                 </span>
               </th>
               <th className="lg:w-30 md:w-30 h-10 w-10 border-r p-2 text-xs sm:w-20 xl:w-40 xl:text-sm">
                 <span className="hidden sm:block md:block lg:block xl:block">
-                  Thursday
+                  Cumartesi
                 </span>
                 <span className="block sm:hidden md:hidden lg:hidden xl:hidden">
-                  Thu
+                  Cum
                 </span>
               </th>
               <th className="lg:w-30 md:w-30 h-10 w-10 border-r p-2 text-xs sm:w-20 xl:w-40 xl:text-sm">
                 <span className="hidden sm:block md:block lg:block xl:block">
-                  Friday
+                  Pazar
                 </span>
                 <span className="block sm:hidden md:hidden lg:hidden xl:hidden">
-                  Fri
-                </span>
-              </th>
-              <th className="lg:w-30 md:w-30 h-10 w-10 border-r p-2 text-xs sm:w-20 xl:w-40 xl:text-sm">
-                <span className="hidden sm:block md:block lg:block xl:block">
-                  Saturday
-                </span>
-                <span className="block sm:hidden md:hidden lg:hidden xl:hidden">
-                  Sat
+                  Paz
                 </span>
               </th>
             </tr>
           </thead>
           <tbody>
             <tr className="h-20 text-center">
-              <td className="lg:w-30 md:w-30 ease h-40 w-10 cursor-pointer overflow-auto border p-1 duration-500 transition hover:bg-gray-300 sm:w-20 xl:w-40 ">
-                <div className="lg:w-30 md:w-30 mx-auto mx-auto flex h-40 w-10 flex-col overflow-hidden sm:w-full xl:w-40">
-                  <div className="top h-5 w-full">
-                    <span className="text-gray-500">1</span>
-                  </div>
-                  <div className="bottom h-30 w-full flex-grow cursor-pointer py-1">
-                    <div className="event mb-1 rounded bg-purple-400 p-1 text-sm text-white">
-                      <span className="event-name">Meeting</span>
-                      <span className="time">12:00~14:00</span>
-                    </div>
-                    <div className="event mb-1 rounded bg-purple-400 p-1 text-sm text-white">
-                      <span className="event-name">Meeting</span>
-                      <span className="time">18:00~20:00</span>
-                    </div>
-                  </div>
-                </div>
-              </td>
-              <td className="lg:w-30 md:w-30 ease h-40 w-10 cursor-pointer overflow-auto border p-1 duration-500 transition hover:bg-gray-300 sm:w-20 xl:w-40">
-                <div className="lg:w-30 md:w-30 mx-auto mx-auto flex h-40 w-10 flex-col overflow-hidden sm:w-full xl:w-40">
-                  <div className="top h-5 w-full">
-                    <span className="text-gray-500">2</span>
-                  </div>
-                  <div className="bottom h-30 w-full flex-grow cursor-pointer py-1" />
-                </div>
-              </td>
-              <td className="lg:w-30 md:w-30 ease h-40 w-10 cursor-pointer overflow-auto border p-1 duration-500 transition hover:bg-gray-300 sm:w-20 xl:w-40">
-                <div className="lg:w-30 md:w-30 mx-auto mx-auto flex h-40 w-10 flex-col overflow-hidden sm:w-full xl:w-40">
-                  <div className="top h-5 w-full">
-                    <span className="text-gray-500">3</span>
-                  </div>
-                  <div className="bottom h-30 w-full flex-grow cursor-pointer py-1" />
-                </div>
-              </td>
-              <td className="lg:w-30 md:w-30 ease h-40 w-10 cursor-pointer overflow-auto border p-1 duration-500 transition hover:bg-gray-300 sm:w-20 xl:w-40">
-                <div className="lg:w-30 md:w-30 mx-auto mx-auto flex h-40 w-10 flex-col overflow-hidden sm:w-full xl:w-40">
-                  <div className="top h-5 w-full">
-                    <span className="text-gray-500">4</span>
-                  </div>
-                  <div className="bottom h-30 w-full flex-grow cursor-pointer py-1" />
-                </div>
-              </td>
-              <td className="lg:w-30 md:w-30 ease h-40 w-10 cursor-pointer overflow-auto border p-1 duration-500 transition hover:bg-gray-300 sm:w-20 xl:w-40">
-                <div className="lg:w-30 md:w-30 mx-auto mx-auto flex h-40 w-10 flex-col overflow-hidden sm:w-full xl:w-40">
-                  <div className="top h-5 w-full">
-                    <span className="text-gray-500">6</span>
-                  </div>
-                  <div className="bottom h-30 w-full flex-grow cursor-pointer py-1" />
-                </div>
-              </td>
-              <td className="lg:w-30 md:w-30 ease h-40 w-10 cursor-pointer overflow-hidden border p-1 duration-500 transition hover:bg-gray-300 sm:w-20 xl:w-40">
-                <div className="lg:w-30 md:w-30 mx-auto mx-auto flex h-40 w-10 flex-col overflow-hidden sm:w-full xl:w-40">
-                  <div className="top h-5 w-full">
-                    <span className="text-gray-500">7</span>
-                  </div>
-                  <div className="bottom h-30 w-full flex-grow cursor-pointer py-1">
-                    <div className="event mb-1 rounded bg-blue-400 p-1 text-sm text-white">
-                      <span className="event-name">Shopping</span>
-                      <span className="time">12:00~14:00</span>
-                    </div>
-                  </div>
-                </div>
-              </td>
-              <td className="lg:w-30 md:w-30 ease h-40 w-10 cursor-pointer overflow-auto border p-1 duration-500 transition hover:bg-gray-300 sm:w-20 xl:w-40">
-                <div className="lg:w-30 md:w-30 mx-auto mx-auto flex h-40 w-10 flex-col overflow-hidden sm:w-full xl:w-40">
-                  <div className="top h-5 w-full">
-                    <span className="text-sm text-gray-500">8</span>
-                  </div>
-                  <div className="bottom h-30 w-full flex-grow cursor-pointer py-1" />
-                </div>
-              </td>
+              {firstWeekDay !== 1 && renderFadedDays()}
+              {Array.from({ length: 7 - firstWeekDay + 1 }).map((_, index) => {
+                const day = firstDayOfWeek.add(index, "day").date();
+                const isToday = dayjs().date() === day;
+
+                const eventsData = events?.filter((item) => {
+                  const itemDate = dayjs(item.date);
+
+                  return (
+                    dayjs(item.date).date() === day &&
+                    dayjs(item.date).month() === currentMonth &&
+                    dayjs(item.date).year() === currentYear
+                  );
+                });
+                debugger;
+                if (eventsData?.length) {
+                  return (
+                    <DayCard
+                      key={day}
+                      day={day}
+                      events={eventsData}
+                      isToday={isToday}
+                      month={currentMonth + 1}
+                      year={currentYear}
+                    />
+                  );
+                }
+
+                return (
+                  <DayCard
+                    key={day}
+                    day={day}
+                    month={currentMonth + 1}
+                    year={currentYear}
+                    isToday={isToday}
+                  />
+                );
+              })}
             </tr>
-            {/*         line 1 */}
+            {/* Mid weeks  */}
+            {Array.from({ length: midWeekLength }).map((_, week) => {
+              const daysToAdd = 7 * (week + 1);
+              return (
+                <tr className="h-20 text-center" key={daysToAdd}>
+                  {Array.from({ length: 7 }).map((_, dayNumber) => {
+                    const day = getDay(dayNumber + 1, daysToAdd);
+                    const isToday = dayjs().date() === day;
+                    const eventsData = events?.filter(
+                      (item) =>
+                        dayjs(item.date).date() === day &&
+                        dayjs(item.date).month() === currentMonth &&
+                        dayjs(item.date).year() === currentYear
+                    );
+                    if (eventsData?.length) {
+                      return (
+                        <DayCard
+                          key={day}
+                          day={day}
+                          events={eventsData}
+                          isToday={isToday}
+                          month={currentMonth + 1}
+                          year={currentYear}
+                        />
+                      );
+                    }
+
+                    return (
+                      <DayCard
+                        key={day}
+                        day={day}
+                        isToday={isToday}
+                        month={currentMonth + 1}
+                        year={currentYear}
+                      />
+                    );
+                  })}
+                </tr>
+              );
+            })}
+            {/* Last week */}
             <tr className="h-20 text-center">
-              <td className="lg:w-30 md:w-30 ease h-40 w-10 cursor-pointer overflow-auto border p-1 duration-500 transition hover:bg-gray-300 sm:w-20 xl:w-40">
-                <div className="lg:w-30 md:w-30 mx-auto mx-auto flex h-40 w-10 flex-col overflow-hidden sm:w-full xl:w-40">
-                  <div className="top h-5 w-full">
-                    <span className="text-gray-500">9</span>
-                  </div>
-                  <div className="bottom h-30 w-full flex-grow cursor-pointer py-1" />
-                </div>
-              </td>
-              <td className="lg:w-30 md:w-30 ease h-40 w-10 cursor-pointer overflow-auto border p-1 duration-500 transition hover:bg-gray-300 sm:w-20 xl:w-40">
-                <div className="lg:w-30 md:w-30 mx-auto mx-auto flex h-40 w-10 flex-col overflow-hidden sm:w-full xl:w-40">
-                  <div className="top h-5 w-full">
-                    <span className="text-gray-500">10</span>
-                  </div>
-                  <div className="bottom h-30 w-full flex-grow cursor-pointer py-1" />
-                </div>
-              </td>
-              <td className="lg:w-30 md:w-30 ease h-40 w-10 cursor-pointer overflow-auto border p-1 duration-500 transition hover:bg-gray-300 sm:w-20 xl:w-40">
-                <div className="lg:w-30 md:w-30 mx-auto mx-auto flex h-40 w-10 flex-col overflow-hidden sm:w-full xl:w-40">
-                  <div className="top h-5 w-full">
-                    <span className="text-gray-500">12</span>
-                  </div>
-                  <div className="bottom h-30 w-full flex-grow cursor-pointer py-1" />
-                </div>
-              </td>
-              <td className="lg:w-30 md:w-30 ease h-40 w-10 cursor-pointer overflow-auto border p-1 duration-500 transition hover:bg-gray-300 sm:w-20 xl:w-40">
-                <div className="lg:w-30 md:w-30 mx-auto mx-auto flex h-40 w-10 flex-col overflow-hidden sm:w-full xl:w-40">
-                  <div className="top h-5 w-full">
-                    <span className="text-gray-500">13</span>
-                  </div>
-                  <div className="bottom h-30 w-full flex-grow cursor-pointer py-1" />
-                </div>
-              </td>
-              <td className="lg:w-30 md:w-30 ease h-40 w-10 cursor-pointer overflow-auto border p-1 duration-500 transition hover:bg-gray-300 sm:w-20 xl:w-40">
-                <div className="lg:w-30 md:w-30 mx-auto mx-auto flex h-40 w-10 flex-col overflow-hidden sm:w-full xl:w-40">
-                  <div className="top h-5 w-full">
-                    <span className="text-gray-500">14</span>
-                  </div>
-                  <div className="bottom h-30 w-full flex-grow cursor-pointer py-1" />
-                </div>
-              </td>
-              <td className="lg:w-30 md:w-30 ease h-40 w-10 cursor-pointer overflow-auto border p-1 duration-500 transition hover:bg-gray-300 sm:w-20 xl:w-40">
-                <div className="lg:w-30 md:w-30 mx-auto mx-auto flex h-40 w-10 flex-col overflow-hidden sm:w-full xl:w-40">
-                  <div className="top h-5 w-full">
-                    <span className="text-gray-500">15</span>
-                  </div>
-                  <div className="bottom h-30 w-full flex-grow cursor-pointer py-1" />
-                </div>
-              </td>
-              <td className="lg:w-30 md:w-30 ease h-40 w-10 cursor-pointer overflow-auto border p-1 duration-500 transition hover:bg-gray-300 sm:w-20 xl:w-40">
-                <div className="lg:w-30 md:w-30 mx-auto mx-auto flex h-40 w-10 flex-col overflow-hidden sm:w-full xl:w-40">
-                  <div className="top h-5 w-full">
-                    <span className="text-sm text-gray-500">16</span>
-                  </div>
-                  <div className="bottom h-30 w-full flex-grow cursor-pointer py-1" />
-                </div>
-              </td>
+              {renderLastWeekDays()}
+              {renderNextMonthWeekDays()}
             </tr>
-            {/*         line 1 */}
-            {/*         line 2 */}
-            <tr className="h-20 text-center">
-              <td className="lg:w-30 md:w-30 ease h-40 w-10 cursor-pointer overflow-auto border p-1 duration-500 transition hover:bg-gray-300 sm:w-20 xl:w-40">
-                <div className="lg:w-30 md:w-30 mx-auto mx-auto flex h-40 w-10 flex-col overflow-hidden sm:w-full xl:w-40">
-                  <div className="top h-5 w-full">
-                    <span className="text-gray-500">16</span>
-                  </div>
-                  <div className="bottom h-30 w-full flex-grow cursor-pointer py-1" />
-                </div>
-              </td>
-              <td className="lg:w-30 md:w-30 ease h-40 w-10 cursor-pointer overflow-auto border p-1 duration-500 transition hover:bg-gray-300 sm:w-20 xl:w-40">
-                <div className="lg:w-30 md:w-30 mx-auto mx-auto flex h-40 w-10 flex-col overflow-hidden sm:w-full xl:w-40">
-                  <div className="top h-5 w-full">
-                    <span className="text-gray-500">17</span>
-                  </div>
-                  <div className="bottom h-30 w-full flex-grow cursor-pointer py-1" />
-                </div>
-              </td>
-              <td className="lg:w-30 md:w-30 ease h-40 w-10 cursor-pointer overflow-auto border p-1 duration-500 transition hover:bg-gray-300 sm:w-20 xl:w-40">
-                <div className="lg:w-30 md:w-30 mx-auto mx-auto flex h-40 w-10 flex-col overflow-hidden sm:w-full xl:w-40">
-                  <div className="top h-5 w-full">
-                    <span className="text-gray-500">18</span>
-                  </div>
-                  <div className="bottom h-30 w-full flex-grow cursor-pointer py-1" />
-                </div>
-              </td>
-              <td className="lg:w-30 md:w-30 ease h-40 w-10 cursor-pointer overflow-auto border p-1 duration-500 transition hover:bg-gray-300 sm:w-20 xl:w-40">
-                <div className="lg:w-30 md:w-30 mx-auto mx-auto flex h-40 w-10 flex-col overflow-hidden sm:w-full xl:w-40">
-                  <div className="top h-5 w-full">
-                    <span className="text-gray-500">19</span>
-                  </div>
-                  <div className="bottom h-30 w-full flex-grow cursor-pointer py-1" />
-                </div>
-              </td>
-              <td className="lg:w-30 md:w-30 ease h-40 w-10 cursor-pointer overflow-auto border p-1 duration-500 transition hover:bg-gray-300 sm:w-20 xl:w-40">
-                <div className="lg:w-30 md:w-30 mx-auto mx-auto flex h-40 w-10 flex-col overflow-hidden sm:w-full xl:w-40">
-                  <div className="top h-5 w-full">
-                    <span className="text-gray-500">20</span>
-                  </div>
-                  <div className="bottom h-30 w-full flex-grow cursor-pointer py-1" />
-                </div>
-              </td>
-              <td className="lg:w-30 md:w-30 ease h-40 w-10 cursor-pointer overflow-auto border p-1 duration-500 transition hover:bg-gray-300 sm:w-20 xl:w-40">
-                <div className="lg:w-30 md:w-30 mx-auto mx-auto flex h-40 w-10 flex-col overflow-hidden sm:w-full xl:w-40">
-                  <div className="top h-5 w-full">
-                    <span className="text-gray-500">21</span>
-                  </div>
-                  <div className="bottom h-30 w-full flex-grow cursor-pointer py-1" />
-                </div>
-              </td>
-              <td className="lg:w-30 md:w-30 ease h-40 w-10 cursor-pointer overflow-auto border p-1 duration-500 transition hover:bg-gray-300 sm:w-20 xl:w-40">
-                <div className="lg:w-30 md:w-30 mx-auto mx-auto flex h-40 w-10 flex-col overflow-hidden sm:w-full xl:w-40">
-                  <div className="top h-5 w-full">
-                    <span className="text-sm text-gray-500">22</span>
-                  </div>
-                  <div className="bottom h-30 w-full flex-grow cursor-pointer py-1" />
-                </div>
-              </td>
-            </tr>
-            {/*         line 2 */}
-            {/*         line 3 */}
-            <tr className="h-20 text-center">
-              <td className="lg:w-30 md:w-30 ease h-40 w-10 cursor-pointer overflow-auto border p-1 duration-500 transition hover:bg-gray-300 sm:w-20 xl:w-40">
-                <div className="lg:w-30 md:w-30 mx-auto mx-auto flex h-40 w-10 flex-col overflow-hidden sm:w-full xl:w-40">
-                  <div className="top h-5 w-full">
-                    <span className="text-gray-500">23</span>
-                  </div>
-                  <div className="bottom h-30 w-full flex-grow cursor-pointer py-1" />
-                </div>
-              </td>
-              <td className="lg:w-30 md:w-30 ease h-40 w-10 cursor-pointer overflow-auto border p-1 duration-500 transition hover:bg-gray-300 sm:w-20 xl:w-40">
-                <div className="lg:w-30 md:w-30 mx-auto mx-auto flex h-40 w-10 flex-col overflow-hidden sm:w-full xl:w-40">
-                  <div className="top h-5 w-full">
-                    <span className="text-gray-500">24</span>
-                  </div>
-                  <div className="bottom h-30 w-full flex-grow cursor-pointer py-1" />
-                </div>
-              </td>
-              <td className="lg:w-30 md:w-30 ease h-40 w-10 cursor-pointer overflow-auto border p-1 duration-500 transition hover:bg-gray-300 sm:w-20 xl:w-40">
-                <div className="lg:w-30 md:w-30 mx-auto mx-auto flex h-40 w-10 flex-col overflow-hidden sm:w-full xl:w-40">
-                  <div className="top h-5 w-full">
-                    <span className="text-gray-500">25</span>
-                  </div>
-                  <div className="bottom h-30 w-full flex-grow cursor-pointer py-1" />
-                </div>
-              </td>
-              <td className="lg:w-30 md:w-30 ease h-40 w-10 cursor-pointer overflow-auto border p-1 duration-500 transition hover:bg-gray-300 sm:w-20 xl:w-40">
-                <div className="lg:w-30 md:w-30 mx-auto mx-auto flex h-40 w-10 flex-col overflow-hidden sm:w-full xl:w-40">
-                  <div className="top h-5 w-full">
-                    <span className="text-gray-500">26</span>
-                  </div>
-                  <div className="bottom h-30 w-full flex-grow cursor-pointer py-1" />
-                </div>
-              </td>
-              <td className="lg:w-30 md:w-30 ease h-40 w-10 cursor-pointer overflow-auto border p-1 duration-500 transition hover:bg-gray-300 sm:w-20 xl:w-40">
-                <div className="lg:w-30 md:w-30 mx-auto mx-auto flex h-40 w-10 flex-col overflow-hidden sm:w-full xl:w-40">
-                  <div className="top h-5 w-full">
-                    <span className="text-gray-500">27</span>
-                  </div>
-                  <div className="bottom h-30 w-full flex-grow cursor-pointer py-1" />
-                </div>
-              </td>
-              <td className="lg:w-30 md:w-30 ease h-40 w-10 cursor-pointer overflow-auto border p-1 duration-500 transition hover:bg-gray-300 sm:w-20 xl:w-40">
-                <div className="lg:w-30 md:w-30 mx-auto mx-auto flex h-40 w-10 flex-col overflow-hidden sm:w-full xl:w-40">
-                  <div className="top h-5 w-full">
-                    <span className="text-gray-500">28</span>
-                  </div>
-                  <div className="bottom h-30 w-full flex-grow cursor-pointer py-1" />
-                </div>
-              </td>
-              <td className="lg:w-30 md:w-30 ease h-40 w-10 cursor-pointer overflow-auto border p-1 duration-500 transition hover:bg-gray-300 sm:w-20 xl:w-40">
-                <div className="lg:w-30 md:w-30 mx-auto mx-auto flex h-40 w-10 flex-col overflow-hidden sm:w-full xl:w-40">
-                  <div className="top h-5 w-full">
-                    <span className="text-sm text-gray-500">29</span>
-                  </div>
-                  <div className="bottom h-30 w-full flex-grow cursor-pointer py-1" />
-                </div>
-              </td>
-            </tr>
-            {/*         line 3 */}
-            {/*         line 4 */}
-            <tr className="h-20 text-center">
-              <td className="lg:w-30 md:w-30 ease h-40 w-10 cursor-pointer overflow-auto border p-1 duration-500 transition hover:bg-gray-300 sm:w-20 xl:w-40">
-                <div className="lg:w-30 md:w-30 mx-auto mx-auto flex h-40 w-10 flex-col overflow-hidden sm:w-full xl:w-40">
-                  <div className="top h-5 w-full">
-                    <span className="text-gray-500">30</span>
-                  </div>
-                  <div className="bottom h-30 w-full flex-grow cursor-pointer py-1" />
-                </div>
-              </td>
-              <td className="lg:w-30 md:w-30 ease h-40 w-10 cursor-pointer overflow-auto border p-1 duration-500 transition hover:bg-gray-300 sm:w-20 xl:w-40">
-                <div className="lg:w-30 md:w-30 mx-auto mx-auto flex h-40 w-10 flex-col overflow-hidden sm:w-full xl:w-40">
-                  <div className="top h-5 w-full">
-                    <span className="text-gray-500">31</span>
-                  </div>
-                  <div className="bottom h-30 w-full flex-grow cursor-pointer py-1" />
-                </div>
-              </td>
-              <td className="lg:w-30 md:w-30 ease h-40 w-10 cursor-pointer overflow-auto border bg-gray-100 p-1 duration-500 transition hover:bg-gray-300 sm:w-20 xl:w-40">
-                <div className="lg:w-30 md:w-30 mx-auto mx-auto flex h-40 w-10 flex-col overflow-hidden sm:w-full xl:w-40">
-                  <div className="top h-5 w-full">
-                    <span className="text-gray-500">1</span>
-                  </div>
-                  <div className="bottom h-30 w-full flex-grow cursor-pointer py-1" />
-                </div>
-              </td>
-              <td className="lg:w-30 md:w-30 ease h-40 w-10 cursor-pointer overflow-auto border bg-gray-100 p-1 duration-500 transition hover:bg-gray-300 sm:w-20 xl:w-40">
-                <div className="lg:w-30 md:w-30 mx-auto mx-auto flex h-40 w-10 flex-col overflow-hidden sm:w-full xl:w-40">
-                  <div className="top h-5 w-full">
-                    <span className="text-gray-500">2</span>
-                  </div>
-                  <div className="bottom h-30 w-full flex-grow cursor-pointer py-1" />
-                </div>
-              </td>
-              <td className="lg:w-30 md:w-30 ease h-40 w-10 cursor-pointer overflow-auto border bg-gray-100 p-1 duration-500 transition hover:bg-gray-300 sm:w-20 xl:w-40">
-                <div className="lg:w-30 md:w-30 mx-auto mx-auto flex h-40 w-10 flex-col overflow-hidden sm:w-full xl:w-40">
-                  <div className="top h-5 w-full">
-                    <span className="text-gray-500">3</span>
-                  </div>
-                  <div className="bottom h-30 w-full flex-grow cursor-pointer py-1" />
-                </div>
-              </td>
-              <td className="lg:w-30 md:w-30 ease h-40 w-10 cursor-pointer overflow-auto border bg-gray-100 p-1 duration-500 transition hover:bg-gray-300 sm:w-20 xl:w-40">
-                <div className="lg:w-30 md:w-30 mx-auto mx-auto flex h-40 w-10 flex-col overflow-hidden sm:w-full xl:w-40">
-                  <div className="top h-5 w-full">
-                    <span className="text-gray-500">4</span>
-                  </div>
-                  <div className="bottom h-30 w-full flex-grow cursor-pointer py-1" />
-                </div>
-              </td>
-              <td className="lg:w-30 md:w-30 ease h-40 w-10 cursor-pointer overflow-auto border bg-gray-100 p-1 duration-500 transition hover:bg-gray-300 sm:w-20 xl:w-40">
-                <div className="lg:w-30 md:w-30 mx-auto mx-auto flex h-40 w-10 flex-col overflow-hidden sm:w-full xl:w-40">
-                  <div className="top h-5 w-full">
-                    <span className="text-sm text-gray-500">5</span>
-                  </div>
-                  <div className="bottom h-30 w-full flex-grow cursor-pointer py-1" />
-                </div>
-              </td>
-            </tr>
-            {/*         line 4 */}
           </tbody>
         </table>
       </div>

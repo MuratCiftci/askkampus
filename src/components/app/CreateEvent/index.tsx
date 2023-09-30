@@ -25,8 +25,8 @@ const CreateEvent = () => {
   const [image, setImage] = useState<File | null>(null);
   const [url, setUrl] = useState<string | null>(null);
 
-  const [date, setDate] = useState<any>(null);
-  const [time, setTime] = useState<any>(null);
+  const [date, setDate] = useState<string | null>(null);
+  const [time, setTime] = useState<string | null>(null);
 
   const onChange: DatePickerProps["onChange"] = (date, dateString) => {
     setDate(dateString);
@@ -62,12 +62,23 @@ const CreateEvent = () => {
       })
       .catch((err) => console.log(err));
   };
-
   const mutate = api.community.createNewEvent.useMutation({
-    onSuccess: async (data) => {
+    onSuccess: async () => {
       toast({
         title: "Etkinlik Oluşturuldu",
       });
+
+      await utils.event.getEventsByType.invalidate({
+        type: "today",
+      });
+      await utils.event.getEventsByType.invalidate({
+        type: "tomorrow",
+      });
+      await utils.event.getEventsByType.invalidate({
+        type: "future",
+      });
+
+      void router.push("/events");
     },
 
     onError: (err) => {
@@ -84,8 +95,9 @@ const CreateEvent = () => {
     const formData = new FormData(e.currentTarget);
     const title = formData.get("community");
     const description = formData.get("description");
+    const location = formData.get("location");
 
-    if (!title || !description) {
+    if (!title || !description || !location) {
       toast({
         title: "Error",
         description: "Lütfen tüm alanları doldurunuz.",
@@ -103,14 +115,30 @@ const CreateEvent = () => {
       return;
     }
 
-    if (typeof title !== "string" || typeof description !== "string") return;
+    if (typeof title !== "string" || typeof description !== "string") {
+      toast({
+        title: "Error",
+        description: "Lütfen tüm alanları doldurunuz.",
+        variant: "destructive",
+      });
+      return;
+    }
 
+    if (!date || !time) {
+      toast({
+        title: "Error",
+        description: "Lütfen tarih ve saat seçiniz.",
+        variant: "destructive",
+      });
+      return;
+    }
+    debugger;
     mutate.mutate({
-      date: date as string,
-      time: time as string,
+      date: date,
+      time: time,
       description: description,
       name: title,
-      location: "",
+      location: location as string,
       communityId: selectedCommunity,
       // image_url: url || "",
     });
@@ -211,7 +239,6 @@ const CreateEvent = () => {
                   <div className="flex items-center gap-x-3">
                     <DatePicker onChange={onChange} />
                     <TimePicker
-                      defaultValue={dayjs(new Date(), "HH:mm")}
                       format="HH:mm"
                       changeOnBlur={true}
                       // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-argument

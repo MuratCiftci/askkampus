@@ -54,7 +54,7 @@ const AllCommunities = () => {
           setActiveTab={setActiveTab}
         />
         <form
-          className="relative mx-auto flex w-full max-w-[24rem] my-4"
+          className="relative mx-auto my-4 flex w-full max-w-[24rem]"
           onSubmit={handleSearch}
         >
           <label htmlFor="simple-search" className="sr-only">
@@ -110,9 +110,13 @@ const AllCommunities = () => {
       ) : isError ? (
         <p>Hata oluştu</p>
       ) : (
-        communities.map((community) => {
-          return <CommunityInfoCard key={community.id} community={community} />;
-        })
+        <div className="flex flex-col items-center justify-center mt-12 gap-12">
+          {communities.map((community) => {
+            return (
+              <CommunityInfoCard key={community.id} community={community} />
+            );
+          })}
+        </div>
       )}
     </div>
   );

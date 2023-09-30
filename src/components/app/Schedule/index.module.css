@@ -36,6 +36,21 @@
   align-self: stretch;
   width: 100%;
 }
+.selectedScheduleContainer {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  align-self: stretch;
+  width: 100%;
+}
+.headerContainer {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  align-self: stretch;
+  width: 30%;
+  margin: 0px auto;
+}
 
 .scheduleColumn {
   display: flex;
@@ -93,6 +108,10 @@
   font-style: normal;
   font-weight: 500;
   line-height: 125%; /* 22.5px */
+  cursor: pointer;
+}
+.eventDescriptionTextTitle:hover {
+  text-decoration: underline;
 }
 .eventDescriptionTextDescription {
   color: var(--gray-500, #6b7280);

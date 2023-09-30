@@ -10,6 +10,7 @@ type Props = {
 
 const CommentCard = ({ comment, isReply }: Props) => {
   const [openReplyArea, setOpenReplyArea] = React.useState(false);
+  const [commentDropdown, setCommentDropdown] = React.useState(false);
   return (
     <article className="rounded-lg bg-white pl-6 pt-6 pb-6 text-base dark:bg-gray-900 dark:text-white">
       <footer className="mb-2 flex items-center justify-between">
@@ -18,10 +19,7 @@ const CommentCard = ({ comment, isReply }: Props) => {
             <img
               // eslint-disable-next-line @next/next/no-img-element
               className="mr-2 h-6 w-6 rounded-full"
-              src={
-                comment.user.image ||
-                "https://flowbite.com/docs/images/people/profile-picture-2.jpg"
-              }
+              src={comment.user.image || ""}
               alt={comment?.user.name || ""}
             />
             {comment.user.name}
@@ -30,23 +28,25 @@ const CommentCard = ({ comment, isReply }: Props) => {
             <p>{dayjs(comment.createdAt).format("DD MMMM YYYY")}</p>
           </p>
         </div>
-        <button
-          id="dropdownComment1Button"
-          //   onClick={() => setCommentDropdown(!commentDropdown)}
-          className="inline-flex items-center rounded-lg bg-white p-2 text-center text-sm font-medium text-gray-500 hover:bg-gray-100 focus:outline-none focus:ring-4 focus:ring-gray-50 dark:bg-gray-900 dark:text-gray-400 dark:hover:bg-gray-700 dark:focus:ring-gray-600"
-          type="button"
-        >
-          <svg
-            className="h-4 w-4"
-            aria-hidden="true"
-            xmlns="http://www.w3.org/2000/svg"
-            fill="currentColor"
-            viewBox="0 0 16 3"
+        <div className="position-relative flex flex-col items-center">
+          <button
+            id="dropdownComment1Button"
+            onClick={() => setCommentDropdown(!commentDropdown)}
+            className="inline-flex items-center rounded-lg bg-white p-2 text-center text-sm font-medium text-gray-500 hover:bg-gray-100 focus:outline-none focus:ring-4 focus:ring-gray-50 dark:bg-gray-900 dark:text-gray-400 dark:hover:bg-gray-700 dark:focus:ring-gray-600"
+            type="button"
           >
-            <path d="M2 0a1.5 1.5 0 1 1 0 3 1.5 1.5 0 0 1 0-3Zm6.041 0a1.5 1.5 0 1 1 0 3 1.5 1.5 0 0 1 0-3ZM14 0a1.5 1.5 0 1 1 0 3 1.5 1.5 0 0 1 0-3Z" />
-          </svg>
-          <span className="sr-only">Comment settings</span>
-        </button>
+            <svg
+              className="h-4 w-4"
+              aria-hidden="true"
+              xmlns="http://www.w3.org/2000/svg"
+              fill="currentColor"
+              viewBox="0 0 16 3"
+            >
+              <path d="M2 0a1.5 1.5 0 1 1 0 3 1.5 1.5 0 0 1 0-3Zm6.041 0a1.5 1.5 0 1 1 0 3 1.5 1.5 0 0 1 0-3ZM14 0a1.5 1.5 0 1 1 0 3 1.5 1.5 0 0 1 0-3Z" />
+            </svg>
+            <span className="sr-only">Comment settings</span>
+          </button>
+        </div>
       </footer>
       <p className="text-gray-500 dark:text-gray-400">{comment.body}</p>
       {isReply ? null : (

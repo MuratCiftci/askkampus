@@ -7,13 +7,7 @@ import { signIn, useSession } from "next-auth/react";
 import { Button } from "~/components/shared/ui/Button";
 import Image from "next/image";
 import Link from "next/link";
-
-const navigation = [
-  { name: "Anasayfa", href: "/", current: true },
-  { name: "Topluluklar", href: "/communities", current: false },
-  { name: "Etkinlikler", href: "#", current: false },
-  { name: "Takvim", href: "/calendar", current: false },
-];
+import { useRouter } from "next/router";
 
 function classNames(...classes: string[]) {
   return classes.filter(Boolean).join(" ");
@@ -21,6 +15,16 @@ function classNames(...classes: string[]) {
 
 export default function Navbar() {
   const { data } = useSession();
+  const router = useRouter();
+  const navigation = [
+    { name: "Anasayfa", href: "/", current: true },
+    { name: "Topluluklar", href: "/communities", current: false },
+    { name: "Etkinlikler", href: "/events", current: false },
+    { name: "Takvim", href: "/calendar", current: false },
+  ];
+
+  const currentItem = navigation.find((item) => item.href === router.pathname);
+
   return (
     <Disclosure as="nav" className="fixed top-0 left-0 z-50 w-full bg-gray-800">
       {({ open }) => (
@@ -54,12 +58,14 @@ export default function Navbar() {
                         key={item.name}
                         href={item.href}
                         className={classNames(
-                          item.current
+                          currentItem?.name === item.name
                             ? "bg-gray-900 text-white"
                             : "text-gray-300 hover:bg-gray-700 hover:text-white",
                           "rounded-md px-3 py-2 text-sm font-medium"
                         )}
-                        aria-current={item.current ? "page" : undefined}
+                        aria-current={
+                          currentItem?.name === item.name ? "page" : undefined
+                        }
                       >
                         {item.name}
                       </Link>
@@ -159,7 +165,7 @@ export default function Navbar() {
                   as="a"
                   href={item.href}
                   className={classNames(
-                    item.current
+                    currentItem?.name === item.name
                       ? "bg-gray-900 text-white"
                       : "text-gray-300 hover:bg-gray-700 hover:text-white",
                     "block rounded-md px-3 py-2 text-base font-medium"

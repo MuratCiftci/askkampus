@@ -166,7 +166,7 @@ model Event {
   updatedAt   DateTime  @updatedAt
   name        String
   description String
-  date        String?
+  date        DateTime
   time        String?
   location    String?
   image_url   String?

@@ -67,9 +67,9 @@ const Posts = () => {
       ) : status === "error" ? (
         <div> Bir şeyler ters gitti...</div>
       ) : (
-        data?.pages.map((page: { posts: any[]; }, i: React.Key) => {
+        data?.pages.map((page: { posts: any[] }, i: React.Key) => {
           return (
-            <div key={i} className="flex flex-col gap-2">
+            <div key={i} className="flex flex-col gap-2 align-center">
               {page.posts.map((post) => (
                 <PostCard post={post} key={post.id} />
               ))}

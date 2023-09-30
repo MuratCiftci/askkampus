@@ -6,12 +6,12 @@ import { TabWithAnimation } from "~/components/shared/ui/TabWithAnimation";
 import { useRouter } from "next/router";
 type UserPostsProps = {
   id: string;
-  sortBy: "new" | "top";
+  sortBy: string;
 };
 
 const UserPosts = ({ id }: UserPostsProps) => {
   const router = useRouter();
-  const sort = router.query.sort as "new" | "top";
+  const sort = router.query.sort as  string;
   const {
     isLoading,
     data: posts,

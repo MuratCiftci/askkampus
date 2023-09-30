@@ -7,7 +7,8 @@ import { useRouter } from "next/router";
 
 const AllCommunities = () => {
   const router = useRouter();
-  const sort = router.query.sort as "new" | "most-followed" | "most-posted";
+  const sort = router.query.sort as string;
+    
 
   const [activeTab, setActiveTab] = React.useState(sort || "new");
   const [searchText, setSearchText] = React.useState("");
@@ -110,7 +111,7 @@ const AllCommunities = () => {
       ) : isError ? (
         <p>Hata oluştu</p>
       ) : (
-        <div className="flex flex-col items-center justify-center mt-12 gap-12">
+        <div className="mt-12 flex flex-col items-center justify-center gap-12">
           {communities.map((community) => {
             return (
               <CommunityInfoCard key={community.id} community={community} />

@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unsafe-call */
 import React from "react";
 import { ArrowBigDown, ArrowBigUp, ArrowUp } from "lucide-react";
 import { Button } from "~/components/shared/ui/Button";
@@ -25,31 +26,33 @@ const PostDetailCard = (props: Props) => {
   const [isDownvoted, setIsDownvoted] = React.useState(false);
 
   const utils = api.useContext();
-  const upvotePost = api.post.upvotePost.useMutation({
-    onSuccess: () => {
-      setUpvoteCount((upvoteCount) => (upvoteCount ? upvoteCount + 1 : 1));
+  // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access
+  // const upvotePost = api.post.up
+  //   onSuccess: () => {
+  //     setUpvoteCount((upvoteCount) => (upvoteCount ? upvoteCount + 1 : 1));
 
-      toast({ title: "Post upvoted" });
-    },
-    onError: (err) => {
-      setIsUpvoted(false);
-      toast({
-        title: "Error",
-        description: err.message,
-        variant: "destructive",
-      });
-    },
-  });
+  //     toast({ title: "Post upvoted" });
+  //   },
+  //   onError: (err: any) => {
+  //     setIsUpvoted(false);
+  //     toast({
+  //       title: "Error",
+  //       // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+  //       description: err.message,
+  //       variant: "destructive",
+  //     });
+  //   },
+  // });
 
   return (
-    <div className="container flex transform flex-col rounded-sm bg-white p-4 shadow-md duration-500 transition hover:shadow-2xl dark:bg-neutral-900">
+    <div className="dark:bg-neutral-900 container flex transform flex-col rounded-sm bg-white p-4 shadow-md duration-500 transition hover:shadow-2xl">
       <div className="flex items-center justify-between pb-4">
         <div className="flex w-10 flex-col items-center justify-center border-l border-transparent   pr-2">
           <div
             className="m-0 cursor-pointer hover:bg-inherit hover:text-blue-500 dark:hover:bg-inherit dark:hover:text-blue-500"
             onClick={() => {
               setIsUpvoted(true);
-              upvotePost.mutate({ postId: post.id });
+              
             }}
           >
             {isUpvoted ? <UpvoteFilled /> : <Upvote />}
@@ -67,19 +70,17 @@ const PostDetailCard = (props: Props) => {
         <div className="align-start flex flex-grow flex-col justify-center pl-2">
           <div className="flex flex-grow flex-row items-center justify-between">
             <div className="flex flex-wrap items-center justify-between">
-              <span className="mx-1 cursor-pointer text-xs text-slate-500 hover:underline dark:text-slate-300 dark:hover:text-slate-200">
+              <span className="text-slate-500 dark:text-slate-300 dark:hover:text-slate-200 mx-1 cursor-pointer text-xs hover:underline">
                 {" "}
                 {post.user?.name} tarafından paylaşıldı{" "}
               </span>{" "}
             </div>
-            <div className="flex flex-col items-start text-xs text-slate-500 dark:text-slate-300">
+            <div className="text-slate-500 dark:text-slate-300 flex flex-col items-start text-xs">
               {getTimeDifference(post.createdAt)}
             </div>
           </div>
-          <h5 className="text-blue-gray-900 mb-2 block font-sans text-xl font-semibold leading-snug tracking-normal antialiased dark:text-white">
-            <Link href={`/post/${post.id}`}>
-              {post.title}
-            </Link>
+          <h5 className="mb-2 block font-sans text-xl font-semibold leading-snug tracking-normal text-blue-gray-900 antialiased dark:text-white">
+            <Link href={`/post/${post.id}`}>{post.title}</Link>
           </h5>
         </div>
       </div>

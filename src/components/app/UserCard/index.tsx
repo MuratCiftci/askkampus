@@ -47,7 +47,7 @@ const UserCard = ({ id }: UserCardProps) => {
         <img
           src={data?.image}
           alt="profile-picture"
-          class="relative inline-block h-32 w-32 rounded-2xl object-cover object-center"
+          className="relative inline-block h-32 w-32 rounded-2xl object-cover object-center"
         />
       </div>
 

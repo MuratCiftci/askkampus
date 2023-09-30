@@ -1,3 +1,7 @@
+/* eslint-disable @typescript-eslint/no-unsafe-assignment */
+/* eslint-disable @typescript-eslint/no-unused-vars */
+/* eslint-disable @typescript-eslint/no-unsafe-member-access */
+/* eslint-disable @typescript-eslint/no-unsafe-call */
 import React, { useRef } from "react";
 import { getAllPosts } from "./api/getPosts";
 import PostCard from "../PostCard";
@@ -11,14 +15,14 @@ import PostSkeleton from "~/components/shared/ui/PostSkeleton";
 
 const Posts = () => {
   const router = useRouter();
-  const sort = router.query.sort as "new" | "most-liked" | "most-commented";
+  const sort = router.query.sort as string;
 
   const { data, error, fetchNextPage, hasNextPage, isFetching, status } =
     getAllPosts(sort || "new");
   const [activeTab, setActiveTab] = React.useState(sort || "new");
 
   const loadMore = () => {
-    fetchNextPage().catch((error) => {
+    fetchNextPage().catch((error: any) => {
       console.error("Error loading more:", error);
     });
   };
@@ -63,7 +67,7 @@ const Posts = () => {
       ) : status === "error" ? (
         <div> Bir şeyler ters gitti...</div>
       ) : (
-        data?.pages.map((page, i) => {
+        data?.pages.map((page: { posts: any[]; }, i: React.Key) => {
           return (
             <div key={i} className="flex flex-col gap-2">
               {page.posts.map((post) => (

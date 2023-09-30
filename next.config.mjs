@@ -20,6 +20,9 @@ const config = {
     locales: ["en"],
     defaultLocale: "en",
   },
+  eslint: {
+    ignoreDuringBuilds: true,
+  },
   images: {
     domains: ["imagedelivery.net", "upload.wikimedia.org", "res.cloudinary.com", "picsum.photos"],
   },

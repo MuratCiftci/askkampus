@@ -11,7 +11,7 @@ const UserProfile = () => {
   const router = useRouter();
   const { id } = router.query as { id: string };
   const { type } = router.query as { type: string };
-  const { sort } = router.query as { sort: "new" | "top" };
+  const { sort } = router.query as { sort:  string};
   const [activeTab, setActiveTab] = React.useState(type || "posts");
   const data = [
     {

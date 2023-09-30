@@ -174,7 +174,7 @@ export const communityRouter = createTRPCRouter({
   ),
 
   getAllCommunities: publicProcedure
-    .input(z.object({ search: z.string(), sort: z.enum(["new", "most-followed", "most-posted"]) }))
+    .input(z.object({ search: z.string(), sort: z.string() }))
     .query(async ({ ctx, input }) => {
 
       let orderByClause: {

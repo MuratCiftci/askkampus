@@ -7,7 +7,7 @@ type Data = {
   createdAt: Date;
   description: string;
   image_url: string;
-  _count: {
+  _count?: {
     users: number;
   };
 };

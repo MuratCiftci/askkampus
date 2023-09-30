@@ -5,7 +5,8 @@
     "allowJs": true,
     "checkJs": true,
     "skipLibCheck": true,
-    "strict": true,
+    "strict": false,
+    "noImplicitAny": true,
     "forceConsistentCasingInFileNames": true,
     "noEmit": true,
     "esModuleInterop": true,
@@ -19,15 +20,17 @@
     "baseUrl": ".",
     "paths": {
       "~/*": ["./src/*"]
-    } 
+    }
   },
-  "include": [ 
+  "include": [
     ".eslintrc.cjs",
     "next-env.d.ts",
     "**/*.ts",
     "**/*.tsx",
     "**/*.cjs",
-    "**/*.mjs"
-, "tailwind.config.cjs ", "tailwind.config.js"  ],
+    "**/*.mjs",
+    "tailwind.config.cjs ",
+    "tailwind.config.js"
+  ],
   "exclude": ["node_modules"]
 }

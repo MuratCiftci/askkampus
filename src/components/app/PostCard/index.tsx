@@ -24,23 +24,20 @@ const PostCard = (props: Props) => {
     postId: post.id,
   });
 
-
   const [upvoteCount, setUpvoteCount] = React.useState(post._count?.votes);
   const [voteStatus, setVoteStatus] = React.useState<
     "UPVOTE" | "DOWNVOTE" | "NONE"
-  // eslint-disable-next-line @typescript-eslint/no-unsafe-argument, @typescript-eslint/no-unsafe-member-access
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-argument, @typescript-eslint/no-unsafe-member-access
   >(userVote?.voteType || "NONE");
   const utils = api.useContext();
   const upvotePost = api.post.toggleVote.useMutation({
-    onSuccess: (data) => {
+    onSuccess: () => {
       toast({ title: "Post upvoted" });
 
-      if (!data) {
-        return;
-      }
       // downvotes are below zero so we need to add them to upvotes
 
-      setUpvoteCount(data);
+      // setUpvoteCount(data);
+      // return data;
     },
     onError: (err) => {
       toast({
@@ -50,7 +47,6 @@ const PostCard = (props: Props) => {
       });
     },
   });
-
 
   const handleVoteStatus = (vote: "UPVOTE" | "DOWNVOTE" | "NONE") => {
     if (voteStatus === vote) {

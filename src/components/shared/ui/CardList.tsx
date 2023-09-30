@@ -43,7 +43,7 @@ const CardList = ({ data, type }: Props) => {
               : "En Popüler Topluluklar"}
           </h3>
           <Link
-            href="#"
+            href={type === "community_last_added" ? "/communities?sort=new" : "/communities?sort=most-followed"}
             className="text-sm font-medium text-blue-600 hover:underline dark:text-blue-500"
           >
             Hepsini Gör

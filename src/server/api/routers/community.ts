@@ -223,6 +223,7 @@ export const communityRouter = createTRPCRouter({
             select: {
               users: true,
               posts: true,
+              events: true,
             },
           },
         },

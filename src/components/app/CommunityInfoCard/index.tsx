@@ -14,6 +14,7 @@ type Props = {
     _count: {
       posts: number;
       users: number;
+      events: number;
     };
   };
 };
@@ -54,7 +55,7 @@ const CommunityInfoCard = ({ community }: Props) => {
 
                 <div className="p-3 text-center">
                   <span className="text-slate-700 block text-xl font-bold uppercase tracking-wide">
-                    0
+                    {community?._count.events}
                   </span>
                   <span className="text-slate-400 text-sm">Etkinlik</span>
                 </div>

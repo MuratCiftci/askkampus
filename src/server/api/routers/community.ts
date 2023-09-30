@@ -41,7 +41,7 @@ export const communityRouter = createTRPCRouter({
       return community;
     }),
 
-  createCommunity: publicProcedure
+  createCommunity: protectedProcedure
     .input(z.object({ name: z.string(), description: z.string(), image_url: z.string() }))
     .mutation(async ({ ctx, input }) => {
       const community = await ctx.prisma.community.create({
@@ -58,7 +58,9 @@ export const communityRouter = createTRPCRouter({
       return community;
     }),
 
-  // get community posts length , image , name , description and total users
+  // get community posts length , image , name , description and total joined users 
+  // also check if user joined this community or not
+
   getCommunityInfo: publicProcedure
     .input(z.object({ id: z.string() }))
     .query(async ({ ctx, input }) => {
@@ -66,8 +68,21 @@ export const communityRouter = createTRPCRouter({
         where: {
           id: input.id,
         },
-        include: {
-          posts: {
+        select: {
+          id: true,
+          name: true,
+          image_url: true,
+          description: true,
+          _count: {
+            select: {
+              users: true,
+              posts: true,
+            },
+          },
+          users: {
+            where: {
+              id: ctx?.session?.user.id,
+            },
             select: {
               id: true,
             },
@@ -75,33 +90,11 @@ export const communityRouter = createTRPCRouter({
         },
       });
 
+
       return community;
-    }),
+    }
+    ),
 
-  joinCommunity: protectedProcedure
-    .input(z.object({ name: z.string() }))
-    .mutation(async ({ ctx, input }) => {
-      const community = await ctx.prisma.community.findUnique({
-        where: {
-          name: input.name,
-        },
-      });
-
-      if (!community) {
-        throw new Error("Community not found");
-      }
-
-      const user = await ctx.prisma.user.update({
-        where: {
-          id: ctx.session.user.id,
-        },
-        data: {
-
-        },
-      });
-
-      return user;
-    }),
 
   getCommunityNameAndId: publicProcedure.query(async ({ ctx }) => {
     const communities = await ctx.prisma.community.findMany({
@@ -120,14 +113,149 @@ export const communityRouter = createTRPCRouter({
         id: true,
         name: true,
         image_url: true,
+        description: true,
       }
     });
 
     return communities;
   }
   ),
-});
+  getLatestCommunities: publicProcedure.query(async ({ ctx }) => {
+    const communities = await ctx.prisma.community.findMany({
+      orderBy: {
+        createdAt: "desc",
+      },
+      select: {
+        id: true,
+        name: true,
+        image_url: true,
+        description: true,
+        createdAt: true,
+      },
+      take: 5,
+    });
 
+    return communities;
+  }
+  ),
+  getTopCommunities: publicProcedure.query(async ({ ctx }) => {
+    const communities = await ctx.prisma.community.findMany({
+      select: {
+        id: true,
+        name: true,
+        image_url: true,
+        description: true,
+        createdAt: true,
+        _count: {
+          select: {
+            users: true,
+          },
+        },
+      },
+      orderBy: {
+        users: {
+          _count: "desc",
+        }
+      },
+      take: 5,
+    },
+    );
+    return communities;
+  }
+  ),
+
+  getAllCommunities: publicProcedure
+    .input(z.object({ search: z.string(), sort: z.enum(["new", "most-followed", "most-posted"]) }))
+    .query(async ({ ctx, input }) => {
+
+      let orderByClause: {
+        [key: string]: "asc" | "desc" | {
+          _count: "asc" | "desc";
+        };
+      } = {
+
+        createdAt: "desc",
+      };
+
+
+
+      if (input.sort === "most-followed") {
+        // Sort by most liked
+        orderByClause = {
+          users: {
+            _count: "desc",
+          },
+        }
+      } else if (input.sort === "most-posted") {
+        // Sort by most posts
+        orderByClause = {
+          posts: {
+            _count: "desc",
+          },
+        }
+      }
+
+
+      const communities = await ctx.prisma.community.findMany({
+        orderBy: orderByClause,
+        where: {
+          name: {
+            contains: input.search,
+            mode: "insensitive",
+          },
+        },
+        select: {
+          id: true,
+          name: true,
+          image_url: true,
+          description: true,
+          createdAt: true,
+          _count: {
+            select: {
+              users: true,
+              posts: true,
+            },
+          },
+        },
+      });
+
+      return communities;
+    }
+    ),
+
+
+  createNewEvent: protectedProcedure
+    .input(
+      z.object({
+        name: z.string(),
+        description: z.string(),
+        location: z.string(),
+        communityId: z.string(),
+        date:  z.string(),
+        time: z.string(),
+      })
+    )
+    .mutation(async ({ ctx, input }) => {
+
+      const createdEvent = await ctx.prisma.event.create({
+        data: {
+          name: input.name,
+          description: input.description,
+          location: input.location,
+          date: input.date,
+          time: input.time,
+          community: {
+            connect: { id: input.communityId }, // Connect the event to the community.
+          },
+          attendees: {
+            connect: { id: ctx?.session?.user.id }, // Connect the event to the user.
+          },
+        },
+      });
+      return createdEvent;
+    }
+    ),
+});
 
 
 

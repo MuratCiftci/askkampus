@@ -1,16 +1,19 @@
 import React, { ChangeEvent, useState } from "react";
-import { PhoneOutgoingIcon, UserIcon } from "lucide-react";
+import { CalendarIcon, PhoneOutgoingIcon, UserIcon } from "lucide-react";
 import { api } from "~/utils/api";
 import { toast } from "~/components/hooks/ui/use-toast";
 import { useRouter } from "next/router";
 import CommunityList from "./CommunityList";
-import cloudinary from "~/utils/cloudinaryConfig";
+import { DatePicker, TimePicker } from "antd";
+import type { DatePickerProps } from "antd";
+import dayjs from "dayjs";
+import "dayjs/locale/tr";
 
 type FormValues = {
   title: string;
   description: string;
 };
-const CreatePost = () => {
+const CreateEvent = () => {
   const { isLoading, data } = api.community.getCommunityNameAndId.useQuery();
 
   const utils = api.useContext();
@@ -21,6 +24,17 @@ const CreatePost = () => {
   >("");
   const [image, setImage] = useState<File | null>(null);
   const [url, setUrl] = useState<string | null>(null);
+
+  const [date, setDate] = useState<any>(null);
+  const [time, setTime] = useState<any>(null);
+
+  const onChange: DatePickerProps["onChange"] = (date, dateString) => {
+    setDate(dateString);
+  };
+
+  const onChangeTime: DatePickerProps["onChange"] = (date, dateString) => {
+    setTime(dateString);
+  };
 
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files.length > 0) {
@@ -49,16 +63,11 @@ const CreatePost = () => {
       .catch((err) => console.log(err));
   };
 
-
-  const mutate = api.post.createPost.useMutation({
+  const mutate = api.community.createNewEvent.useMutation({
     onSuccess: async (data) => {
       toast({
-        title: "Post oluşturuldu",
+        title: "Etkinlik Oluşturuldu",
       });
-
-      await utils.post.getAllPosts.invalidate();
-
-      await router.push(`/post/${data.id}`);
     },
 
     onError: (err) => {
@@ -69,7 +78,6 @@ const CreatePost = () => {
       });
     },
   });
-
 
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -98,10 +106,13 @@ const CreatePost = () => {
     if (typeof title !== "string" || typeof description !== "string") return;
 
     mutate.mutate({
-      title: title,
-      body: description,
-      community: selectedCommunity,
-      image_url: url || "",
+      date: date as string,
+      time: time as string,
+      description: description,
+      name: title,
+      location: "",
+      communityId: selectedCommunity,
+      // image_url: url || "",
     });
   };
 
@@ -110,15 +121,15 @@ const CreatePost = () => {
   }
 
   return (
-    <div className=" mx-auto mt-12 rounded-lg bg-slate-50 p-4 shadow-lg dark:bg-gray-800 dark:text-gray-100">
+    <div className=" bg-slate-50 mx-auto mt-12 rounded-lg p-4 shadow-lg dark:bg-gray-800 dark:text-gray-100">
       <form onSubmit={handleSubmit}>
         <div className="space-y-12">
           <div className="border-b border-gray-900/10 pb-12">
             <h2 className="text-base font-semibold leading-7 text-gray-900 dark:text-gray-100">
-              Yeni Paylaşım Oluştur
+              Yeni Etkinlik Oluştur
             </h2>
             <p className="mt-1 max-w-2xl text-sm leading-6 text-gray-600 dark:text-gray-400">
-              Yeni Paylaşım oluşturarak topluluk üyeleri ile etkileşime
+              Yeni Etkinlik oluşturarak topluluk üyeleri ile etkileşime
               geçebilirsiniz. Paylaşım oluşturmak için aşağıdaki formu doldurun.
             </p>
 
@@ -172,6 +183,43 @@ const CreatePost = () => {
                   />
                 </div>
               </div>
+              <div className="col-span-full">
+                <label
+                  htmlFor="about"
+                  className="block text-sm font-medium leading-6 text-gray-900 dark:text-gray-100"
+                >
+                  Lokasyon
+                </label>
+                <div className="mt-2">
+                  <textarea
+                    id="location"
+                    name="location"
+                    rows={3}
+                    className="block w-full rounded-md border-0 py-1.5 px-3 py-2 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 dark:bg-gray-800 dark:text-gray-100 sm:text-sm sm:leading-6"
+                    defaultValue={""}
+                  />
+                </div>
+              </div>
+              <div className="col-span-full">
+                <label
+                  htmlFor="about"
+                  className="block text-sm font-medium leading-6 text-gray-900 dark:text-gray-100"
+                >
+                  Tarih
+                </label>
+                <div className="mt-2">
+                  <div className="flex items-center gap-x-3">
+                    <DatePicker onChange={onChange} />
+                    <TimePicker
+                      defaultValue={dayjs(new Date(), "HH:mm")}
+                      format="HH:mm"
+                      changeOnBlur={true}
+                      // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-argument
+                      onChange={onChangeTime}
+                    />
+                  </div>
+                </div>
+              </div>
 
               <div className="col-span-full">
                 <label
@@ -213,4 +261,4 @@ const CreatePost = () => {
   );
 };
 
-export default CreatePost;
+export default CreateEvent;

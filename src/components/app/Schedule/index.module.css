@@ -1,0 +1,103 @@
+.schedule {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--16, 64px);
+}
+
+.header {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--4, 16px);
+}
+
+.title {
+  color: var(--gray-900, #111928);
+  text-align: center;
+  font-size: 36px;
+  font-style: normal;
+  font-weight: 800;
+  line-height: 125%; /* 45px */
+  letter-spacing: -0.36px;
+}
+.subtitle {
+  color: var(--gray-500, #6b7280);
+  text-align: center;
+  font-size: 20px;
+  font-style: normal;
+  font-weight: 500;
+  line-height: 125%; /* 25px */
+}
+
+.scheduleContainer {
+  display: flex;
+  align-items: flex-start;
+  align-self: stretch;
+  width: 100%;
+}
+
+.scheduleColumn {
+  display: flex;
+  padding: 0px var(--8, 32px);
+  flex-direction: column;
+  align-items: flex-start;
+  gap: var(--12, 48px);
+  flex: 1 0 0;
+  align-self: stretch;
+  border-right: 1px solid var(--gray-200, #e5e7eb);
+}
+.scheduleColumnTitle {
+  color: var(--gray-900, #111928);
+  text-align: center;
+  font-size: 24px;
+  font-style: normal;
+  font-weight: 700;
+  line-height: 150%; /* 36px */
+  letter-spacing: -0.24px;
+  align-items: stretch;
+  width: 100%;
+}
+.event {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: var(--4, 16px);
+  align-self: stretch;
+}
+.eventTitle {
+  color: var(--gray-900, #111928);
+
+  /* text-xl/font-bold */
+  font-size: 20px;
+  font-style: normal;
+  font-weight: 700;
+  line-height: 150%; /* 30px */
+}
+.eventDescription {
+  display: flex;
+  align-items: center;
+  gap: var(--3, 12px);
+}
+
+.eventDescriptionText  {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: flex-start;
+}
+
+.eventDescriptionTextTitle {
+  color: var(--gray-900, #111928);
+  font-size: 18px;
+  font-style: normal;
+  font-weight: 500;
+  line-height: 125%; /* 22.5px */
+}
+.eventDescriptionTextDescription {
+  color: var(--gray-500, #6b7280);
+  font-size: 14px;
+  font-style: normal;
+  font-weight: 400;
+  line-height: 150%; /* 21px */
+}

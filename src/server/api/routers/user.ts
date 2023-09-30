@@ -9,19 +9,32 @@ import {
 export const userRouter = createTRPCRouter({
 
     getUserPosts: publicProcedure
-        .input(z.object({ id: z.string() }))
+        .input(z.object({ id: z.string(), sort: z.string().optional() }))
         .query(async ({ ctx, input }) => {
+            let orderByClause: {
+                [key: string]: "asc" | "desc" | {
+                    _count: "asc" | "desc";
+                };
+            } = {
+                createdAt: "desc",
+            };
 
 
+            if (input.sort === "top") {
+                // Sort by most liked
+                orderByClause = {
+                    votes: {
+                        _count: "desc",
+                    },
+                }
+            }
 
             const posts = await ctx.prisma.post.findMany({
                 where: {
                     userId: input.id,
                 },
 
-                orderBy: {
-                    createdAt: "desc",
-                },
+                orderBy: orderByClause,
                 include: {
                     community: {
                         select: {
@@ -160,6 +173,64 @@ export const userRouter = createTRPCRouter({
             return user;
         }
         ),
+
+    joinCommunity: protectedProcedure
+        .input(z.object({ id: z.string() }))
+        .mutation(async ({ ctx, input }) => {
+            const community = await ctx.prisma.community.findUnique({
+                where: {
+                    id: input.id,
+                },
+            });
+
+            if (!community) {
+                throw new Error("Community not found");
+            }
+
+            const user = await ctx.prisma.user.update({
+                where: {
+                    id: ctx.session.user.id,
+                },
+                data: {
+                    communities: {
+                        connect: {
+                            id: community.id,
+                        },
+                    },
+                },
+            });
+
+            return user;
+        }),
+
+    leaveCommunity: protectedProcedure
+        .input(z.object({ id: z.string() }))
+        .mutation(async ({ ctx, input }) => {
+            const community = await ctx.prisma.community.findUnique({
+                where: {
+                    id: input.id,
+                },
+            });
+
+            if (!community) {
+                throw new Error("Community not found");
+            }
+
+            const user = await ctx.prisma.user.update({
+                where: {
+                    id: ctx.session.user.id,
+                },
+                data: {
+                    communities: {
+                        disconnect: {
+                            id: community.id,
+                        },
+                    },
+                },
+            });
+
+            return user;
+        }),
 
 });
 

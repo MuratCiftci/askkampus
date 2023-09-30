@@ -75,33 +75,35 @@ const Sidebar = ({ children }: { children: React.ReactNode }) => {
               </Link>
             </li>
             <li>
-              <button
-                onClick={() => setOpenDropdown(!openDropdown)}
-                type="button"
+              <Link
+                href="/communities"
                 className="group flex w-full items-center rounded-lg p-2 text-base text-gray-900 duration-75 transition hover:bg-gray-100 dark:text-white dark:hover:bg-gray-700"
-                aria-controls="dropdown-example"
-                data-collapse-toggle="dropdown-example"
               >
                 <Users />
                 <span className="ml-3 flex-1 whitespace-nowrap text-left">
                   Topluluklar
                 </span>
-                <svg
-                  className="h-3 w-3"
-                  aria-hidden="true"
-                  xmlns="http://www.w3.org/2000/svg"
-                  fill="none"
-                  viewBox="0 0 10 6"
+                <div
+                  className="flex-shrink-0"
+                  onClick={() => setOpenDropdown(!openDropdown)}
                 >
-                  <path
-                    stroke="currentColor"
-                    stroke-linecap="round"
-                    stroke-linejoin="round"
-                    stroke-width="2"
-                    d="m1 1 4 4 4-4"
-                  />
-                </svg>
-              </button>
+                  <svg
+                    className="h-3 w-3"
+                    aria-hidden="true"
+                    xmlns="http://www.w3.org/2000/svg"
+                    fill="none"
+                    viewBox="0 0 10 6"
+                  >
+                    <path
+                      stroke="currentColor"
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      stroke-width="2"
+                      d="m1 1 4 4 4-4"
+                    />
+                  </svg>
+                </div>
+              </Link>
               {openDropdown ? (
                 <ul id="dropdown-example" className="space-y-2 py-2">
                   {communityList}

@@ -1,0 +1,5 @@
+-- AlterTable
+ALTER TABLE "Event" ADD COLUMN     "image_url" TEXT,
+ADD COLUMN     "time" TEXT,
+ALTER COLUMN "date" DROP NOT NULL,
+ALTER COLUMN "date" SET DATA TYPE TEXT;

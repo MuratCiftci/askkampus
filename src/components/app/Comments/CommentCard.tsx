@@ -10,7 +10,6 @@ type Props = {
 
 const CommentCard = ({ comment, isReply }: Props) => {
   const [openReplyArea, setOpenReplyArea] = React.useState(false);
-  console.log(comment, "comment");
   return (
     <article className="rounded-lg bg-white pl-6 pt-6 pb-6 text-base dark:bg-gray-900 dark:text-white">
       <footer className="mb-2 flex items-center justify-between">

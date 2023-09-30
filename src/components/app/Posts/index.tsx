@@ -5,11 +5,17 @@ import { api } from "~/utils/api";
 import { Button } from "~/components/shared/ui/Button";
 import useInfiniteScroll from "~/components/hooks/useInfiniteQuery";
 import { TabWithAnimation } from "~/components/shared/ui/TabWithAnimation";
+import { useRouter } from "next/router";
+import CardSkeleton from "~/components/shared/ui/CardSkeleton";
+import PostSkeleton from "~/components/shared/ui/PostSkeleton";
 
 const Posts = () => {
+  const router = useRouter();
+  const sort = router.query.sort as "new" | "most-liked" | "most-commented";
+
   const { data, error, fetchNextPage, hasNextPage, isFetching, status } =
-    getAllPosts();
-  const [activeTab, setActiveTab] = React.useState("new");
+    getAllPosts(sort || "new");
+  const [activeTab, setActiveTab] = React.useState(sort || "new");
 
   const loadMore = () => {
     fetchNextPage().catch((error) => {
@@ -21,13 +27,6 @@ const Posts = () => {
 
   useInfiniteScroll(loadMore, target);
 
-  if (status === "loading") {
-    return <div>Loading...</div>;
-  }
-
-  if (status === "error") {
-    return <div>Error: {error.message}</div>;
-  }
   const tabs = [
     {
       label: "En Yeni",
@@ -37,13 +36,13 @@ const Posts = () => {
     },
     {
       label: "En Çok Beğenilen",
-      value: "top",
+      value: "most-liked",
       desc: `Kullanıcı yorumları burada görüntülenir. Yeni,popüler ve en çok yorum  olarak sıralayabilirsiniz.`,
       path: `/?sort=most-liked`,
     },
     {
       label: "En Çok Yorum Alan",
-      value: "comments",
+      value: "most-commented",
       desc: `Kullanıcı yorumları burada görüntülenir. Yeni,popüler ve en çok yorum olarak sıralayabilirsiniz.`,
       path: `/?sort=most-commented`,
     },
@@ -56,18 +55,27 @@ const Posts = () => {
         activeTab={activeTab}
         setActiveTab={setActiveTab}
       />
-      {data?.pages.map((page, i) => {
-        return (
-          <div key={i}>
-            {page.posts.map((post) => (
-              <PostCard post={post} key={post.id} />
-            ))}
-          </div>
-        );
-      })}
+      {status === "loading" ? (
+        <div className="flex flex-col gap-12">
+          <PostSkeleton />
+          <PostSkeleton />
+        </div>
+      ) : status === "error" ? (
+        <div> Bir şeyler ters gitti...</div>
+      ) : (
+        data?.pages.map((page, i) => {
+          return (
+            <div key={i} className="flex flex-col gap-2">
+              {page.posts.map((post) => (
+                <PostCard post={post} key={post.id} />
+              ))}
+            </div>
+          );
+        })
+      )}
       {hasNextPage ? <div ref={target} className="h-10" /> : null}
       {/* Infinite Scroll */}
-      {isFetching ? <div>Loading...</div> : null}
+      {isFetching ? <PostSkeleton /> : null}
     </div>
   );
 };

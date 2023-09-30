@@ -15,7 +15,7 @@ type UserCardProps = {
 };
 
 const UserCard = ({ id }: UserCardProps) => {
-  const { data, loading, error } = api.user.getUserInfoAndStats.useQuery({
+  const { data, isLoading, error } = api.user.getUserInfoAndStats.useQuery({
     id,
   });
 
@@ -37,7 +37,7 @@ const UserCard = ({ id }: UserCardProps) => {
     },
   ];
 
-  if (loading) {
+  if (isLoading) {
     return <CardSkeleton />;
   }
 

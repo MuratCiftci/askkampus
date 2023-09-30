@@ -19,20 +19,30 @@ type Props = {
 
 const PostCard = (props: Props) => {
   const { post } = props;
+  // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+  const { isLoading, data: userVote } = api.post.checkIfUserHasVoted.useQuery({
+    postId: post.id,
+  });
+
 
   const [upvoteCount, setUpvoteCount] = React.useState(post._count?.votes);
-  const [isUpvoted, setIsUpvoted] = React.useState(false);
-  const [isDownvoted, setIsDownvoted] = React.useState(false);
-
+  const [voteStatus, setVoteStatus] = React.useState<
+    "UPVOTE" | "DOWNVOTE" | "NONE"
+  // eslint-disable-next-line @typescript-eslint/no-unsafe-argument, @typescript-eslint/no-unsafe-member-access
+  >(userVote?.voteType || "NONE");
   const utils = api.useContext();
-  const upvotePost = api.post.upvotePost.useMutation({
-    onSuccess: () => {
-      setUpvoteCount((upvoteCount) => (upvoteCount ? upvoteCount + 1 : 1));
-
+  const upvotePost = api.post.toggleVote.useMutation({
+    onSuccess: (data) => {
       toast({ title: "Post upvoted" });
+
+      if (!data) {
+        return;
+      }
+      // downvotes are below zero so we need to add them to upvotes
+
+      setUpvoteCount(data);
     },
     onError: (err) => {
-      setIsUpvoted(false);
       toast({
         title: "Error",
         description: err.message,
@@ -41,20 +51,27 @@ const PostCard = (props: Props) => {
     },
   });
 
-  console.log(post, "post");
+
+  const handleVoteStatus = (vote: "UPVOTE" | "DOWNVOTE" | "NONE") => {
+    if (voteStatus === vote) {
+      setVoteStatus("NONE");
+    } else {
+      setVoteStatus(vote);
+    }
+  };
 
   return (
-    <div className="container m-8 mb-8 flex max-w-lg transform flex-col rounded-xl bg-white p-4  drop-shadow-xl shadow-xl duration-500 transition hover:scale-105 hover:shadow-2xl dark:bg-neutral-900">
+    <div className="dark:bg-neutral-900 container m-8 mb-8 flex max-w-lg transform flex-col rounded-xl bg-white  p-4 shadow-xl drop-shadow-xl duration-500 transition hover:scale-105 hover:shadow-2xl">
       <div className="flex items-center justify-between pb-4">
         <div className="flex w-10 flex-col items-center justify-center border-l border-transparent   pr-2">
           <div
             className="m-0 cursor-pointer hover:bg-inherit hover:text-blue-500 dark:hover:bg-inherit dark:hover:text-blue-500"
             onClick={() => {
-              setIsUpvoted(true);
-              upvotePost.mutate({ postId: post.id });
+              handleVoteStatus("UPVOTE");
+              upvotePost.mutate({ postId: post.id, voteType: "UPVOTE" });
             }}
           >
-            {isUpvoted ? <UpvoteFilled /> : <Upvote />}
+            {voteStatus === "UPVOTE" ? <UpvoteFilled /> : <Upvote />}
           </div>
 
           <span className="m-0 p-0 text-xs font-bold text-gray-500">
@@ -62,8 +79,14 @@ const PostCard = (props: Props) => {
             {upvoteCount}{" "}
           </span>
 
-          <div className="w-24px h-24px cursor-pointer hover:bg-inherit hover:text-orange-500 dark:hover:bg-inherit dark:hover:text-orange-500">
-            {isDownvoted ? <DownvoteFilled /> : <Downvote />}
+          <div
+            onClick={() => {
+              handleVoteStatus("DOWNVOTE");
+              upvotePost.mutate({ postId: post.id, voteType: "DOWNVOTE" });
+            }}
+            className="w-24px h-24px cursor-pointer hover:bg-inherit hover:text-orange-500 dark:hover:bg-inherit dark:hover:text-orange-500"
+          >
+            {voteStatus === "DOWNVOTE" ? <DownvoteFilled /> : <Downvote />}
           </div>
         </div>
         <a className="inline-block" href="#">
@@ -78,7 +101,7 @@ const PostCard = (props: Props) => {
         <div className="ml-4 flex flex-grow flex-col">
           <div className="flex flex-wrap items-center justify-between">
             <Link
-              className="mr-2 inline-block text-sm font-bold text-slate-900 hover:underline dark:text-slate-100
+              className="text-slate-900 dark:text-slate-100 mr-2 inline-block text-sm font-bold hover:underline
             
             "
               href={`/community/${post?.communityId || ""}`}
@@ -86,23 +109,21 @@ const PostCard = (props: Props) => {
               {post?.community?.name}
             </Link>
             <Link
-              className="mx-1 cursor-pointer text-xs text-slate-500 hover:underline dark:text-slate-300 dark:hover:text-slate-200"
+              className="text-slate-500 dark:text-slate-300 dark:hover:text-slate-200 mx-1 cursor-pointer text-xs hover:underline"
               href={`/user/${post.user?.id || ""}`}
             >
               {" "}
               {post.user?.name} tarafından paylaşıldı{" "}
             </Link>{" "}
           </div>
-          <div className="flex flex-col items-start text-xs text-slate-500 dark:text-slate-300">
+          <div className="text-slate-500 dark:text-slate-300 flex flex-col items-start text-xs">
             {getTimeDifference(post.createdAt)}
           </div>
         </div>
       </div>
       <div className="p-4">
-        <h5 className="text-blue-gray-900 mb-2 block font-sans text-xl font-semibold leading-snug tracking-normal antialiased">
-          <Link href={`/post/${post.id}`}>
-            {post.title}
-          </Link>
+        <h5 className="mb-2 block font-sans text-xl font-semibold leading-snug tracking-normal text-blue-gray-900 antialiased">
+          <Link href={`/post/${post.id}`}>{post.title}</Link>
         </h5>
         <div className="py-4">
           {post.image_url && (

@@ -20,7 +20,6 @@ const UserComments = ({ id }: UserCommentsProps) => {
   if (error) {
     return <div>Error</div>;
   }
-  console.log(comments, "comments");
   return (
     <div className="flex flex-col items-center justify-center">
       {comments.map((comment) => {

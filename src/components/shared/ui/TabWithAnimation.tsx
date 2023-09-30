@@ -12,7 +12,7 @@ type TabWithAnimationProps = {
   data: {
     label: string;
     value: string;
-    desc: string;
+    desc?: string;
     path: string;
   }[];
   activeTab: string;

@@ -62,6 +62,7 @@ model User {
   replies       Reply[]
   communities   Community[]
   PostVote      PostVote[]
+  events        Event[]
 }
 
 model VerificationToken {
@@ -83,6 +84,7 @@ model Community {
   updatedAt   DateTime @updatedAt
   posts       Post[]
   users       User[]
+  events      Event[]
 }
 
 model Post {
@@ -98,8 +100,6 @@ model Post {
   userId      String
   comments    Comment[]
   categories  CategoriesOnPost[]
-  upvotes     Int                @default(0)
-  downvotes   Int                @default(0)
   votes       PostVote[]
 }
 
@@ -139,7 +139,7 @@ model Reply {
   userId    String
   parent    Reply?   @relation("ChildOf", fields: [parentId], references: [id])
   parentId  String?
-  replies   Reply[]  @relation("ChildOf")
+  children  Reply[]  @relation("ChildOf")
 }
 
 model Category {
@@ -158,6 +158,21 @@ model CategoriesOnPost {
   postId     String
   category   Category @relation(fields: [categoryId], references: [id])
   categoryId String
+}
+
+model Event {
+  id          String    @id @default(cuid())
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+  name        String
+  description String
+  date        String?
+  time        String?
+  location    String?
+  image_url   String?
+  community   Community @relation(fields: [communityId], references: [id])
+  communityId String
+  attendees   User[]
 }
 
 enum Role {

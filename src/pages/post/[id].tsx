@@ -39,7 +39,6 @@ const Post = () => {
     return <div>Post not found</div>;
   }
 
-  console.log(post, "post");
 
   return (
     <div className="w-full">

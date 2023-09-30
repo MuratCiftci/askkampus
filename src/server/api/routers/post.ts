@@ -12,17 +12,44 @@ export const postRouter = createTRPCRouter({
       z.object({
         limit: z.number().min(1).max(100).nullish(),
         cursor: z.string().nullish(),
+        sort: z.enum(["new", "most-liked", "most-commented"]).nullish(),
       })
     )
     .query(async ({ ctx, input }) => {
       const limit = input.limit ?? 10;
       const take = limit + 1;
-      console.log(limit, "limit");
-      console.log(take, "take");
-      const postsCount = await ctx.prisma.post.count();
-      console.log(postsCount, "postsCount");
+
+
+      let orderByClause: {
+        [key: string]: "asc" | "desc" | {
+          _count: "asc" | "desc";
+        };
+      } = {
+        createdAt: "desc",
+      };
+
+
+      if (input.sort === "most-liked") {
+        // Sort by most liked
+        orderByClause = {
+          votes: {
+            _count: "desc",
+          },
+        }
+      } else if (input.sort === "most-commented") {
+        // Sort by most commented
+        orderByClause = {
+          comments: {
+            _count: "desc",
+          },
+        }
+      }
+
+
+
       const { cursor } = input;
       const posts = await ctx.prisma.post.findMany({
+        orderBy: orderByClause,
         take: take,
         include: {
           community: {
@@ -47,15 +74,11 @@ export const postRouter = createTRPCRouter({
         },
 
         cursor: cursor ? { id: cursor } : undefined,
-        orderBy: {
-          createdAt: "desc",
-        },
       });
 
       let nextCursor: typeof cursor | undefined = undefined;
       if (posts.length > limit) {
         const nextItem = posts.pop();
-        console.log(nextItem, "nextItem");
         nextCursor = nextItem?.id;
       }
 
@@ -92,6 +115,14 @@ export const postRouter = createTRPCRouter({
               votes: true,
             },
           },
+
+          // check if user has voted on this post
+          votes: {
+            where: {
+              userId: ctx?.session?.user.id,
+            },
+          },
+
         },
       });
 
@@ -330,27 +361,78 @@ export const postRouter = createTRPCRouter({
 
       return reply;
     }),
-  upvotePost: protectedProcedure
-    .input(z.object({ postId: z.string() }))
+  toggleVote: protectedProcedure
+    .input(z.object({ postId: z.string(), voteType: z.enum(["UPVOTE", "DOWNVOTE"]) }))
     .mutation(async ({ ctx, input }) => {
-      const post = await ctx.prisma.post.update({
-        where: {
-          id: input.postId,
-        },
+      const { postId, voteType } = input
+      const userId = ctx.session.user.id;
 
-        data: {
-          votes: {
-            create: {
-              user: {
-                connect: {
-                  id: ctx.session.user.id,
-                },
-              },
-            },
-          },
+      // Check if the user has already voted on this post
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
+      const existingVote = await ctx.prisma.postVote.findFirst({
+        where: {
+          postId,
+          userId,
         },
       });
 
-      return post;
+
+      if (existingVote) {
+        // User has already voted, so we need to remove the vote
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
+        await ctx.prisma.postVote.update({
+          where: {
+            // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access
+            id: existingVote.id,
+          },
+          data: {
+            voteType,
+          },
+        });
+      }
+      else {
+        // User has not voted, so we need to add the vote
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-assignment
+        await ctx.prisma.postVote.create({
+          data: {
+            voteType,
+            Post: {
+              connect: {
+                id: postId,
+              },
+            },
+            user: {
+              connect: {
+                id: userId,
+              },
+            },
+          },
+        });
+      }
+
     }),
+
+  checkIfUserHasVoted: protectedProcedure
+    .input(z.object({ postId: z.string() }))
+    .query(async ({ ctx, input }) => {
+      const userId = ctx.session.user.id;
+
+      // Check if the user has already voted on this post
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
+      const existingVote = await ctx.prisma.postVote.findFirst({
+        where: {
+          postId: input.postId,
+          userId,
+        },
+      });
+      if (!existingVote) {
+        return null;
+      }
+
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-return
+      return existingVote;
+    }),
+
 });
+
+

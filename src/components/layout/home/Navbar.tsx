@@ -10,9 +10,9 @@ import Link from "next/link";
 
 const navigation = [
   { name: "Anasayfa", href: "/", current: true },
-  { name: "Topluluklar", href: "#", current: false },
+  { name: "Topluluklar", href: "/communities", current: false },
   { name: "Etkinlikler", href: "#", current: false },
-  { name: "Takvim", href: "#", current: false },
+  { name: "Takvim", href: "/calendar", current: false },
 ];
 
 function classNames(...classes: string[]) {
@@ -21,7 +21,6 @@ function classNames(...classes: string[]) {
 
 export default function Navbar() {
   const { data } = useSession();
-  console.log(data);
   return (
     <Disclosure as="nav" className="fixed top-0 left-0 z-50 w-full bg-gray-800">
       {({ open }) => (
@@ -51,7 +50,7 @@ export default function Navbar() {
                 <div className="hidden sm:ml-6 sm:block">
                   <div className="flex space-x-4">
                     {navigation.map((item) => (
-                      <a
+                      <Link
                         key={item.name}
                         href={item.href}
                         className={classNames(
@@ -63,7 +62,7 @@ export default function Navbar() {
                         aria-current={item.current ? "page" : undefined}
                       >
                         {item.name}
-                      </a>
+                      </Link>
                     ))}
                   </div>
                 </div>

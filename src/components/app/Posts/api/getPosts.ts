@@ -1,19 +1,24 @@
 import { api } from "~/utils/api";
 
-export const getAllPosts = () => {
+type GetPostsArgs = {
+  sort: "new" | "most-liked" | "most-commented";
+};
+
+export const getAllPosts = (sort: GetPostsArgs["sort"]) => {
   const getInfinitePosts = api.post.getAllPosts.useInfiniteQuery(
     {
       limit: 2,
+      sort,
     },
     {
       getNextPageParam: (lastPage) => lastPage.nextCursor,
       refetchOnWindowFocus: false,
       refetchOnReconnect: false,
-      cacheTime: 1000 * 60 * 10 /* 10 minutes */,
+      staleTime: 1000 * 60 * 1 /* 10 minutes */,
+      cacheTime: 1000 * 60 * 5 /* 10 minutes */,
     }
   );
 
-  console.log(getInfinitePosts, "getInfinitePosts");
 
   return getInfinitePosts;
 };

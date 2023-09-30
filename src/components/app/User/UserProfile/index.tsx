@@ -50,10 +50,10 @@ const UserProfile = () => {
         />
         <Tabs tabs={tabs} />
 
-        {type === "posts" ? (
-          <UserPosts id={id} sortBy={sort} />
-        ) : (
+        {type === "comments" ? (
           <UserComments id={id} />
+        ) : (
+          <UserPosts id={id} sortBy={sort} />
         )}
       </div>
       <UserCard id={id} />

@@ -242,6 +242,7 @@ export const postRouter = createTRPCRouter({
           _count: {
             select: {
               votes: true,
+              comments: true,
             },
           },
           community: {

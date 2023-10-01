@@ -11,11 +11,19 @@ import CommunityStatsCard from "~/components/app/CommunityStatsCard";
 import CommunityBanner from "~/components/app/CommunityBanner";
 import NoFound from "~/components/app/NoFound";
 import { TabWithAnimation } from "~/components/shared/ui/TabWithAnimation";
+import { type inferRouterOutputs } from "@trpc/server";
+import { type AppRouter } from "~/server/api/root";
 
 type FormValues = {
   title: string;
   description: string;
 };
+
+type RouterOutput = inferRouterOutputs<AppRouter>;
+type Post = RouterOutput["post"]["getAllPosts"]["posts"][number];
+type UserPosts = RouterOutput["user"]["getUserPosts"][number];
+type PostWithUser = Post & UserPosts;
+
 
 const Community = () => {
   const router = useRouter();
@@ -77,7 +85,7 @@ const Community = () => {
           ) : (
             <>
               <TabWithAnimation data={tabs} activeTab={activeTab} setActiveTab={setActiveTab} />
-              {posts?.map((post) => (
+              {posts?.map((post : PostWithUser) => (
                 <Link href={`/post/${post.id}`} key={post.id}>
                   <div className="align-center flex w-full cursor-pointer flex-col items-center justify-center gap-2 ">
                     <PostCard post={post} />

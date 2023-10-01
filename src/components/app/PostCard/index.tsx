@@ -16,8 +16,9 @@ import { type AppRouter } from "~/server/api/root";
 
 type RouterOutput = inferRouterOutputs<AppRouter>;
 type Post = RouterOutput["post"]["getAllPosts"]["posts"][number];
+type UserPosts = RouterOutput["user"]["getUserPosts"][number];
 type Props = {
-  post: Post;
+  post: Post & UserPosts;
 };
 
 const PostCard = (props: Props) => {

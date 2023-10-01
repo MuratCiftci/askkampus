@@ -60,6 +60,13 @@ export const eventsRouter = createTRPCRouter({
                             name: true,
                             image_url: true
                         }
+                    },
+                    attendees: {
+                        select: {
+                            id: true,
+                            name: true,
+                            image: true,
+                        }
                     }
                 },
 
@@ -213,6 +220,13 @@ export const eventsRouter = createTRPCRouter({
                         select: {
                             name: true,
                             image_url: true
+                        }
+                    },
+                    attendees: {
+                        select: {
+                            id: true,
+                            name: true,
+                            image: true,
                         }
                     }
                 },

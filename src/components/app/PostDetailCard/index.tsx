@@ -52,7 +52,6 @@ const PostDetailCard = (props: Props) => {
             className="m-0 cursor-pointer hover:bg-inherit hover:text-blue-500 dark:hover:bg-inherit dark:hover:text-blue-500"
             onClick={() => {
               setIsUpvoted(true);
-              
             }}
           >
             {isUpvoted ? <UpvoteFilled /> : <Upvote />}
@@ -90,7 +89,7 @@ const PostDetailCard = (props: Props) => {
           {post.image_url && (
             <div className="relative h-48">
               <Image
-                className="rounded-xl object-contain"
+                className="rounded-xl object-contain w-full h-full"
                 src={post.image_url}
                 alt="Post image"
                 layout="fill"
@@ -99,9 +98,7 @@ const PostDetailCard = (props: Props) => {
           )}
         </div>
         <p className="block text-base font-normal leading-relaxed text-gray-700 antialiased dark:text-gray-200">
-          {typeof post.body === "string" && post.body.length > 200
-            ? post.body.slice(0, 200) + "..."
-            : post.body}
+          {post.body}
         </p>
       </div>
     </div>

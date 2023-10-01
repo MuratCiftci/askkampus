@@ -365,5 +365,91 @@ export const userRouter = createTRPCRouter({
         return posts;
     }
     ),
+    joinEvent: protectedProcedure
+        .input(z.object({ id: z.string() }))
+        .mutation(async ({ ctx, input }) => {
+            const event = await ctx.prisma.event.findUnique({
+                where: {
+                    id: input.id,
+                },
+            });
+
+            if (!event) {
+                throw new Error("Event not found");
+            }
+
+            const user = await ctx.prisma.user.update({
+                where: {
+                    id: ctx.session.user.id,
+                },
+                data: {
+                    events: {
+                        connect: {
+                            id: event.id,
+                        },
+                    },
+                },
+            });
+
+            return user;
+        }),
+    leaveEvent: protectedProcedure.
+        input(z.object({ id: z.string() }))
+        .mutation(async ({ ctx, input }) => {
+            const event = await ctx.prisma.event.findUnique({
+                where: {
+                    id: input.id,
+                },
+            });
+
+            if (!event) {
+                throw new Error("Event not found");
+            }
+
+            const user = await ctx.prisma.user.update({
+                where: {
+                    id: ctx.session.user.id,
+                },
+                data: {
+                    events: {
+                        disconnect: {
+                            id: event.id,
+                        },
+                    },
+                },
+            });
+
+            return user;
+        }),
+    getMyEvents: protectedProcedure.query(async ({ ctx }) => {
+        const events = await ctx.prisma.event.findMany({
+            where: {
+                attendees: {
+                    some: {
+                        id: ctx.session.user.id,
+
+                    },
+                },
+            },
+            include: {
+                community: {
+                    select: {
+                        id: true,
+                        name: true,
+                        image_url: true,
+                    },
+                },
+                attendees: {
+                    select: {
+                        id: true,
+                        name: true,
+                        image: true,
+                    },
+                },
+            },
+        });
+
+        return events;
+    }),
 });
 

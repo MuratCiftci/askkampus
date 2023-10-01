@@ -3,21 +3,24 @@
 /* eslint-disable @typescript-eslint/no-unsafe-member-access */
 /* eslint-disable @typescript-eslint/no-unsafe-call */
 import React, { useRef } from "react";
-import { getAllPosts } from "./api/getPosts";
+import { getAllPosts, getFollowedCommunitiesPosts } from "./api/getPosts";
 import PostCard from "../PostCard";
+import { api } from "~/utils/api";
+import { Button } from "~/components/shared/ui/Button";
 import useInfiniteScroll from "~/components/hooks/useInfiniteQuery";
 import { TabWithAnimation } from "~/components/shared/ui/TabWithAnimation";
 import { useRouter } from "next/router";
 import CardSkeleton from "~/components/shared/ui/CardSkeleton";
 import PostSkeleton from "~/components/shared/ui/PostSkeleton";
 import Tabs from "~/components/shared/ui/Tabs";
+import { useSession } from "next-auth/react";
 
-const Posts = () => {
+const FollowedCommunitiesPosts = () => {
   const router = useRouter();
   const sort = router.query.sort as string;
-
+  const { status: sesssionStatus } = useSession();
   const { data, error, fetchNextPage, hasNextPage, isFetching, status } =
-    getAllPosts(sort || "new");
+    getFollowedCommunitiesPosts(sort || "new");
 
   const loadMore = () => {
     fetchNextPage().catch((error: any) => {
@@ -45,23 +48,31 @@ const Posts = () => {
   ];
 
   const sortTabs = [
-    { key: "new", name: "En Yeni", path: "/?sort=new", isDefault: true },
+    {
+      key: "new",
+      name: "En Yeni",
+      path: "/followed?sort=new",
+      isDefault: true,
+    },
     {
       key: "most-liked",
       name: "En Çok Beğenilen",
-      path: "/?sort=most-liked",
+      path: "/followed?sort=most-liked",
     },
     {
       key: "most-commented",
       name: "En Çok Yorum Alan",
-      path: "/?sort=most-commented",
+      path: "/followed?sort=most-commented",
     },
   ];
 
   return (
     <div className="mt-4 w-full">
-      <TabWithAnimation data={tabs} activeTab="all" />
-      <div className="flex flex-row items-center justify-center  w-full gap-4 m-w-2xl">
+      {sesssionStatus === "authenticated" && (
+        <TabWithAnimation data={tabs} activeTab="followed" />
+      )}
+
+      <div className="flex w-full flex-row items-center justify-center gap-4">
         <Tabs tabs={sortTabs} />
       </div>
       {status === "loading" ? (
@@ -74,7 +85,10 @@ const Posts = () => {
       ) : (
         data?.pages.map((page: { posts: any[] }, i: React.Key) => {
           return (
-            <div key={i} className="align-center items-center flex flex-col gap-2">
+            <div
+              key={i}
+              className="align-center flex flex-col items-center gap-2"
+            >
               {page.posts.map((post) => (
                 <PostCard post={post} key={post.id} />
               ))}
@@ -89,4 +103,4 @@ const Posts = () => {
   );
 };
 
-export default Posts;
+export default FollowedCommunitiesPosts;

@@ -60,7 +60,7 @@ const Sidebar = ({ children }: { children: React.ReactNode }) => {
 
       <aside
         id="sidebar-multi-level-sidebar"
-        className="fixed top-16 left-0 z-40 h-screen w-64 -translate-x-full transition-transform sm:translate-x-0"
+        className="fixed top-16 left-0 z-40 h-screen w-48 -translate-x-full transition-transform sm:translate-x-0"
         aria-label="Sidebar"
       >
         <div className="h-full overflow-y-auto bg-gray-50 px-3 py-16 dark:bg-gray-800">
@@ -132,7 +132,11 @@ const Sidebar = ({ children }: { children: React.ReactNode }) => {
                       d="M1 8h11m0 0L8 4m4 4-4 4m4-11h3a2 2 0 0 1 2 2v10a2 2 0 0 1-2 2h-3"
                     />
                   </svg>
-                  <span className="ml-3 flex-1 whitespace-nowrap">
+                  <span
+                    className="ml-3 flex-1 whitespace-nowrap"
+                    aria-label="Çıkış Yap"
+                    onClick={() => void signOut()}
+                  >
                     Çıkış Yap
                   </span>
                 </span>
@@ -171,7 +175,7 @@ const Sidebar = ({ children }: { children: React.ReactNode }) => {
         </div>
       </aside>
 
-      <div className="mt-24 px-8 sm:ml-64">
+      <div className="mt-24 px-8 sm:ml-48">
         <div className="rounded-lg border-2 border-dashed border-gray-200 p-4 dark:border-gray-700">
           {children}
         </div>

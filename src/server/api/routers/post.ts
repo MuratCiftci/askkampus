@@ -66,9 +66,30 @@ export const postRouter = createTRPCRouter({
             },
           },
 
+          favorites: {
+            where: {
+              userId: ctx?.session?.user.id,
+
+            },
+            select: {
+              postId: true,
+            },
+          },
+          votes: {
+            where: {
+              userId: ctx?.session?.user.id,
+            },
+            select: {
+              postId: true,
+              voteType: true,
+            },
+          },
+
+
           _count: {
             select: {
               votes: true,
+              comments: true,
             },
           },
         },
@@ -81,6 +102,33 @@ export const postRouter = createTRPCRouter({
         const nextItem = posts.pop();
         nextCursor = nextItem?.id;
       }
+      const promises = posts.map(async (post) => {
+        const votes = post._count?.votes;
+
+        if (votes !== undefined) {
+          const postVotes = await ctx.prisma.postVote.groupBy({
+            by: ["voteType"],
+            where: {
+              postId: post.id,
+            },
+            _count: {
+              voteType: true,
+            },
+          });
+          post._count.votes = postVotes.reduce((acc, curr) => {
+            if (curr.voteType === "UPVOTE") {
+              return acc + curr._count.voteType;
+            }
+            return acc - curr._count.voteType;
+          }
+            , 0)
+        }
+      });
+
+
+      // Wait for all promises to complete in parallel
+      await Promise.all(promises);
+
 
       return {
         posts,
@@ -113,6 +161,7 @@ export const postRouter = createTRPCRouter({
           _count: {
             select: {
               votes: true,
+              comments: true,
             },
           },
 
@@ -376,10 +425,21 @@ export const postRouter = createTRPCRouter({
         },
       });
 
+      console.log(existingVote);
+
 
       if (existingVote) {
         // User has already voted, so we need to remove the vote
         // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
+        if (existingVote.voteType === voteType) {
+          await ctx.prisma.postVote.delete({
+            where: {
+              id: existingVote.id,
+            },
+          });
+          return;
+        }
+
         await ctx.prisma.postVote.update({
           where: {
             // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access
@@ -391,7 +451,7 @@ export const postRouter = createTRPCRouter({
         });
       }
       else {
-        // User has not voted, so we need to add the vote
+     
         // eslint-disable-next-line @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-assignment
         await ctx.prisma.postVote.create({
           data: {
@@ -432,7 +492,114 @@ export const postRouter = createTRPCRouter({
       // eslint-disable-next-line @typescript-eslint/no-unsafe-return
       return existingVote;
     }),
+  // get only user's followed communities posts
+  getFollowedCommunitiesPosts: protectedProcedure
+    .input(z.object({ limit: z.number().min(1).max(100).nullish(), cursor: z.string().nullish() }))
+    .query(async ({ ctx, input }) => {
+      const limit = input.limit ?? 10;
+      const take = limit + 1;
 
+      const { cursor } = input;
+
+      const posts = await ctx.prisma.post.findMany({
+        where: {
+          community: {
+            users: {
+              some: {
+                id: ctx?.session?.user.id,
+              },
+            },
+          },
+        },
+        orderBy: {
+          createdAt: "desc",
+        },
+        take: take,
+        include: {
+          community: {
+            select: {
+              id: true,
+              name: true,
+              image_url: true,
+            },
+          },
+          user: {
+            select: {
+              name: true,
+              id: true,
+            },
+          },
+          favorites: {
+            where: {
+              userId: ctx?.session?.user.id,
+
+            },
+            select: {
+              postId: true,
+            },
+          },
+          votes: {
+            where: {
+              userId: ctx?.session?.user.id,
+            },
+            select: {
+              postId: true,
+              voteType: true,
+            },
+          },
+
+          _count: {
+            select: {
+              votes: true,
+              comments: true,
+            },
+          },
+        },
+
+        cursor: cursor ? { id: cursor } : undefined,
+      });
+
+      let nextCursor: typeof cursor | undefined = undefined;
+      if (posts.length > limit) {
+        const nextItem = posts.pop();
+        nextCursor = nextItem?.id;
+      }
+
+      const promises = posts.map(async (post) => {
+        const votes = post._count?.votes;
+
+        if (votes !== undefined) {
+          const postVotes = await ctx.prisma.postVote.groupBy({
+            by: ["voteType"],
+            where: {
+              postId: post.id,
+            },
+            _count: {
+              voteType: true,
+            },
+          });
+          post._count.votes = postVotes.reduce((acc, curr) => {
+            if (curr.voteType === "UPVOTE") {
+              return acc + curr._count.voteType;
+            }
+            return acc - curr._count.voteType;
+          }
+            , 0)
+        }
+      });
+
+
+      // Wait for all promises to complete in parallel
+      await Promise.all(promises);
+
+
+
+
+      return {
+        posts,
+        nextCursor,
+      };
+    }
+    ),
 });
-
 

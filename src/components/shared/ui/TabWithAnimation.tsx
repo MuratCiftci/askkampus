@@ -16,7 +16,7 @@ type TabWithAnimationProps = {
     path: string;
   }[];
   activeTab: string;
-  setActiveTab: Dispatch<SetStateAction<string>>;
+  setActiveTab?: Dispatch<SetStateAction<string>>;
 };
 
 export function TabWithAnimation({
@@ -27,7 +27,7 @@ export function TabWithAnimation({
   const router = useRouter();
 
   const handleTabChange = (value: string) => {
-    setActiveTab(value);
+    setActiveTab && setActiveTab(value);
 
     const tab = data.find((tab) => tab.value === value);
 
@@ -40,7 +40,12 @@ export function TabWithAnimation({
     <Tabs id="custom-animation" value={activeTab}>
       <TabsHeader>
         {data.map(({ label, value }) => (
-          <Tab key={value} value={value} onClick={() => handleTabChange(value)}>
+          <Tab
+            key={value}
+            value={value}
+            onClick={() => handleTabChange(value)}
+            style={{ overflow: "hidden" }}
+          >
             {label}
           </Tab>
         ))}

@@ -17,5 +17,6 @@ export type Post = {
   };
   _count?: {
     votes: number;
+    comments: number;
   };
 };

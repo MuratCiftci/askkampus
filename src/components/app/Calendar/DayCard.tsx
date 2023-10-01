@@ -46,7 +46,7 @@ const DayCard = ({ disabled, day, events, isToday, month, year }: Props) => {
         }
       }}
     >
-      <div className="lg:w-30 md:w-30 mx-auto mx-auto flex h-40 w-10 flex-col overflow-hidden sm:w-full xl:w-40">
+      <div className="lg:w-30 md:w-30 mx-auto mx-auto flex h-40 w-10 flex-col overflow-hidden sm:w-full xl:w-30">
         <div className="top h-5 w-full">
           <span
             className={`text-sm text-gray-500 ${
@@ -63,7 +63,7 @@ const DayCard = ({ disabled, day, events, isToday, month, year }: Props) => {
                   key={event.id}
                   className="event mt-2 flex justify-between rounded bg-blue-400 p-1 text-sm text-white"
                 >
-                  <span className="truncate text-opacity-100">
+                  <span className="truncate text-opacity-100 w-28 text-left pl-1">
                     {event.name.length > 20
                       ? event.name.slice(0, 10) + "..."
                       : event.name}
@@ -76,7 +76,7 @@ const DayCard = ({ disabled, day, events, isToday, month, year }: Props) => {
             : null}
           {events?.length && events?.length > 2 && (
             <div className="event mt-2 flex justify-between rounded bg-blue-400 p-1 text-sm text-white">
-              <span className="truncate text-opacity-100">
+              <span className="truncate text-opacity-100 text-left pl-1">
                 {events.length - 2} tane daha...
               </span>
             </div>
@@ -88,7 +88,7 @@ const DayCard = ({ disabled, day, events, isToday, month, year }: Props) => {
                 key={event.id}
                 className="event mt-2 flex justify-between rounded bg-blue-400 p-1 text-sm text-white"
               >
-                <span className="truncate text-opacity-100">
+                <span className="truncate text-opacity-100 text-left pl-1">
                   {event.name.length > 20
                     ? event.name.slice(0, 10) + "..."
                     : event.name}

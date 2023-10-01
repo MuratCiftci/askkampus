@@ -165,7 +165,7 @@ const Calendar = () => {
         <table className="w-full">
           <thead>
             <tr>
-              <th className="lg:w-30 md:w-30 h-10 w-10 border-r p-2 text-xs sm:w-20 xl:w-40 xl:text-sm">
+              <th className="lg:w-30 md:w-25 h-10 w-10 border-r p-2 text-xs sm:w-20 xl:w-30 xl:text-sm">
                 <span className="hidden sm:block md:block lg:block xl:block">
                   Pazartesi
                 </span>
@@ -174,7 +174,7 @@ const Calendar = () => {
                 </span>
               </th>
 
-              <th className="lg:w-30 md:w-30 h-10 w-10 border-r p-2 text-xs sm:w-20 xl:w-40 xl:text-sm">
+              <th className="lg:w-30 md:w-25 h-10 w-10 border-r p-2 text-xs sm:w-20 xl:w-30 xl:text-sm">
                 <span className="hidden sm:block md:block lg:block xl:block">
                   Salı
                 </span>
@@ -182,7 +182,7 @@ const Calendar = () => {
                   Sal
                 </span>
               </th>
-              <th className="lg:w-30 md:w-30 h-10 w-10 border-r p-2 text-xs sm:w-20 xl:w-40 xl:text-sm">
+              <th className="lg:w-30 md:w-25 h-10 w-10 border-r p-2 text-xs sm:w-20 xl:w-30 xl:text-sm">
                 <span className="hidden sm:block md:block lg:block xl:block">
                   Çarşamba
                 </span>
@@ -190,7 +190,7 @@ const Calendar = () => {
                   Çar
                 </span>
               </th>
-              <th className="lg:w-30 md:w-30 h-10 w-10 border-r p-2 text-xs sm:w-20 xl:w-40 xl:text-sm">
+              <th className="lg:w-30 md:w-25 h-10 w-10 border-r p-2 text-xs sm:w-20 xl:w-30 xl:text-sm">
                 <span className="hidden sm:block md:block lg:block xl:block">
                   Perşembe
                 </span>
@@ -198,7 +198,7 @@ const Calendar = () => {
                   Per
                 </span>
               </th>
-              <th className="lg:w-30 md:w-30 h-10 w-10 border-r p-2 text-xs sm:w-20 xl:w-40 xl:text-sm">
+              <th className="lg:w-30 md:w-25 h-10 w-10 border-r p-2 text-xs sm:w-20 xl:w-30 xl:text-sm">
                 <span className="hidden sm:block md:block lg:block xl:block">
                   Cuma
                 </span>
@@ -206,7 +206,7 @@ const Calendar = () => {
                   Cum
                 </span>
               </th>
-              <th className="lg:w-30 md:w-30 h-10 w-10 border-r p-2 text-xs sm:w-20 xl:w-40 xl:text-sm">
+              <th className="lg:w-30 md:w-25 h-10 w-10 border-r p-2 text-xs sm:w-20 xl:w-30 xl:text-sm">
                 <span className="hidden sm:block md:block lg:block xl:block">
                   Cumartesi
                 </span>
@@ -214,7 +214,7 @@ const Calendar = () => {
                   Cum
                 </span>
               </th>
-              <th className="lg:w-30 md:w-30 h-10 w-10 border-r p-2 text-xs sm:w-20 xl:w-40 xl:text-sm">
+              <th className="lg:w-30 md:w-25 h-10 w-10 border-r p-2 text-xs sm:w-20 xl:w-30 xl:text-sm">
                 <span className="hidden sm:block md:block lg:block xl:block">
                   Pazar
                 </span>

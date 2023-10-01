@@ -28,3 +28,27 @@ export const getAllPosts = (sort: GetPostsArgs["sort"]) => {
 
   return getInfinitePosts;
 };
+
+export const getFollowedCommunitiesPosts = (sort: GetPostsArgs["sort"]) => {
+
+  const getPosts: any = api.post.getFollowedCommunitiesPosts;
+  // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+  const getInfinitePosts = getPosts.useInfiniteQuery(
+    {
+      limit: 2,
+      sort,
+    },
+    {
+      getNextPageParam: (lastPage: { nextCursor: any; }) => lastPage.nextCursor,
+      refetchOnWindowFocus: false,
+      refetchOnReconnect: false,
+      staleTime: 1000 * 60 * 1 /* 1 minutes */,
+      cacheTime: 1000 * 60 * 5 /* 5 minutes */,
+    }
+  )
+
+  return getInfinitePosts;
+}
+
+
+

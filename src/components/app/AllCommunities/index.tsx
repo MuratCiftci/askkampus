@@ -29,7 +29,7 @@ const AllCommunities = () => {
       path: "/communities?sort=new",
     },
     {
-      label: "En Çok Takip edilenler",
+      label: "En Popüler",
       value: "most-followed",
       path: "/communities?sort=most-followed",
     },

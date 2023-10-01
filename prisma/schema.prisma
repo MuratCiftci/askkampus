@@ -14,12 +14,6 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-model Example {
-  id        String   @id @default(cuid())
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-}
-
 // Necessary for Next auth
 model Account {
   id                String  @id @default(cuid())
@@ -48,13 +42,13 @@ model Session {
 }
 
 model User {
-  id            String      @id @default(cuid())
+  id            String         @id @default(cuid())
   name          String?
-  email         String?     @unique
+  email         String?        @unique
   emailVerified DateTime?
   image         String?
-  username      String?     @unique @db.VarChar(30)
-  about         String?     @db.Text
+  username      String?        @unique @db.VarChar(30)
+  about         String?        @db.Text
   accounts      Account[]
   sessions      Session[]
   posts         Post[]
@@ -63,6 +57,7 @@ model User {
   communities   Community[]
   PostVote      PostVote[]
   events        Event[]
+  PostFavorite  PostFavorite[]
 }
 
 model VerificationToken {
@@ -101,6 +96,7 @@ model Post {
   comments    Comment[]
   categories  CategoriesOnPost[]
   votes       PostVote[]
+  favorites   PostFavorite[]
 }
 
 model PostVote {
@@ -108,6 +104,18 @@ model PostVote {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
   voteType  VoteType
+  postId    String
+  userId    String
+  Post      Post     @relation(fields: [postId], references: [id])
+  user      User     @relation(fields: [userId], references: [id])
+
+  @@unique([postId, userId])
+}
+
+model PostFavorite {
+  id        String   @id @default(cuid())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
   postId    String
   userId    String
   Post      Post     @relation(fields: [postId], references: [id])

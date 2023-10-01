@@ -1,5 +1,4 @@
 import React from "react";
-import { type Post } from "./index.type";
 import { ArrowBigDown, ArrowBigUp, ArrowUp } from "lucide-react";
 import { Button } from "~/components/shared/ui/Button";
 import Image from "next/image";
@@ -12,7 +11,11 @@ import Upvote from "~/components/shared/icons/Upvote";
 import Downvote from "~/components/shared/icons/Downvote";
 import UpvoteFilled from "~/components/shared/icons/UpvoteFilled";
 import DownvoteFilled from "~/components/shared/icons/DownvoteFilled";
+import { type inferRouterOutputs } from "@trpc/server";
+import { type AppRouter } from "~/server/api/root";
 
+type RouterOutput = inferRouterOutputs<AppRouter>;
+type Post = RouterOutput["post"]["getAllPosts"]["posts"][number];
 type Props = {
   post: Post;
 };
@@ -20,24 +23,37 @@ type Props = {
 const PostCard = (props: Props) => {
   const { post } = props;
   // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
-  const { isLoading, data: userVote } = api.post.checkIfUserHasVoted.useQuery({
-    postId: post.id,
-  });
 
+  const [isFavorited, setIsFavorited] = React.useState(
+    post.favorites?.length > 0
+  );
   const [upvoteCount, setUpvoteCount] = React.useState(post._count?.votes);
-  const [voteStatus, setVoteStatus] = React.useState<
-    "UPVOTE" | "DOWNVOTE" | "NONE"
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-argument, @typescript-eslint/no-unsafe-member-access
-  >(userVote?.voteType || "NONE");
+  const [isUpvoted, setIsUpvoted] = React.useState(
+    !!(post.votes?.length > 0 && post.votes?.[0]?.voteType === "UPVOTE")
+  );
+  const [isDownvoted, setIsDownvoted] = React.useState(
+    !!(post?.votes?.length > 0 && post.votes?.[0]?.voteType === "DOWNVOTE")
+  );
+  console.log(isDownvoted, isUpvoted, post.votes?.[0]?.voteType, post?.title);
+
   const utils = api.useContext();
   const upvotePost = api.post.toggleVote.useMutation({
     onSuccess: () => {
-      toast({ title: "Post upvoted" });
+      toast({ title: "Oy verildi" });
+    },
+    onError: (err) => {
+      toast({
+        title: "Error",
+        description: err.message,
+        variant: "destructive",
+      });
+    },
+  });
 
-      // downvotes are below zero so we need to add them to upvotes
-
-      // setUpvoteCount(data);
-      // return data;
+  const addToFavorites = api.user.togglePostToFavorites.useMutation({
+    onSuccess: () => {
+      toast({ title: isFavorited ? "Favorilerden çıkarıldı" : "Post favorilere eklendi" });
+      setIsFavorited(prev => !prev)
     },
     onError: (err) => {
       toast({
@@ -49,11 +65,19 @@ const PostCard = (props: Props) => {
   });
 
   const handleVoteStatus = (vote: "UPVOTE" | "DOWNVOTE" | "NONE") => {
-    if (voteStatus === vote) {
-      setVoteStatus("NONE");
-    } else {
-      setVoteStatus(vote);
+    let voteChange = 0;
+
+    if (vote === "UPVOTE") {
+      voteChange = isUpvoted ? -1 : isDownvoted ? 2 : 1;
+      setIsUpvoted(!isUpvoted);
+      setIsDownvoted(false);
+    } else if (vote === "DOWNVOTE") {
+      voteChange = isDownvoted ? 1 : isUpvoted ? -2 : -1;
+      setIsDownvoted(!isDownvoted);
+      setIsUpvoted(false);
     }
+
+    setUpvoteCount((count) => count + voteChange);
   };
 
   return (
@@ -67,7 +91,7 @@ const PostCard = (props: Props) => {
               upvotePost.mutate({ postId: post.id, voteType: "UPVOTE" });
             }}
           >
-            {voteStatus === "UPVOTE" ? <UpvoteFilled /> : <Upvote />}
+            {isUpvoted ? <UpvoteFilled /> : <Upvote />}
           </div>
 
           <span className="m-0 p-0 text-xs font-bold text-gray-500">
@@ -82,7 +106,7 @@ const PostCard = (props: Props) => {
             }}
             className="w-24px h-24px cursor-pointer hover:bg-inherit hover:text-orange-500 dark:hover:bg-inherit dark:hover:text-orange-500"
           >
-            {voteStatus === "DOWNVOTE" ? <DownvoteFilled /> : <Downvote />}
+            {isDownvoted ? <DownvoteFilled /> : <Downvote />}
           </div>
         </div>
         <a className="inline-block" href="#">
@@ -152,13 +176,24 @@ const PostCard = (props: Props) => {
               >
                 <path d="M8 0C3.6 0 0 3.1 0 7s3.6 7 8 7h.6l5.4 2v-4.4c1.2-1.2 2-2.8 2-4.6 0-3.9-3.6-7-8-7zm4 10.8v2.3L8.9 12H8c-3.3 0-6-2.2-6-5s2.7-5 6-5 6 2.2 6 5c0 2.2-2 3.8-2 3.8z" />
               </svg>
-              <span>Yorum yap</span>
+              <span> {post._count?.comments} Yorum</span>
             </div>
           </Link>
           <div className="group block flex-1 cursor-pointer px-3 py-4 text-center text-sm font-medium text-gray-600 hover:bg-gray-50 hover:text-gray-800 dark:text-gray-400 dark:hover:bg-gray-900 dark:hover:text-gray-200">
-            <div className="flex items-center justify-center gap-2">
-              <OutlinedFavorite />
-              <span>Favoriye Ekle</span>
+            <div
+              className="flex items-center justify-center gap-2"
+              onClick={() => addToFavorites.mutate({ id: post.id })}
+            >
+              {isFavorited ? (
+                <Image src={"/images/heart.png"} width={16} height={16} alt="heart" />
+              ) : (
+                <OutlinedFavorite />
+              )}
+
+              <span>
+                {" "}
+                {isFavorited ? "Favorilerden çıkar" : "Favorilere ekle"}
+              </span>
             </div>
           </div>
         </div>

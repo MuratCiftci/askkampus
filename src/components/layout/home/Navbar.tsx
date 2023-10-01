@@ -3,7 +3,7 @@ import { Disclosure, Menu, Transition } from "@headlessui/react";
 // import BarChart3Icon from "lucide-react";
 // import XIcon from "lucide-react";
 
-import { signIn, useSession } from "next-auth/react";
+import { signIn, signOut, useSession } from "next-auth/react";
 import { Button } from "~/components/shared/ui/Button";
 import Image from "next/image";
 import Link from "next/link";
@@ -136,15 +136,15 @@ export default function Navbar() {
                         </Menu.Item>
                         <Menu.Item>
                           {({ active }) => (
-                            <a
-                              href="#"
+                            <Button
+                              onClick={() => void signOut()}
                               className={classNames(
                                 active ? "bg-gray-100" : "",
                                 "block px-4 py-2 text-sm text-gray-700"
                               )}
                             >
                               Çıkış Yap
-                            </a>
+                            </Button>
                           )}
                         </Menu.Item>
                       </Menu.Items>

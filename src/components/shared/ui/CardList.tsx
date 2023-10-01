@@ -43,7 +43,11 @@ const CardList = ({ data, type }: Props) => {
               : "En Popüler Topluluklar"}
           </h3>
           <Link
-            href={type === "community_last_added" ? "/communities?sort=new" : "/communities?sort=most-followed"}
+            href={
+              type === "community_last_added"
+                ? "/communities?sort=new"
+                : "/communities?sort=most-followed"
+            }
             className="text-sm font-medium text-blue-600 hover:underline dark:text-blue-500"
           >
             Hepsini Gör
@@ -57,13 +61,15 @@ const CardList = ({ data, type }: Props) => {
             {data?.map((item) => (
               <li className="py-3 sm:py-4" key={item.id}>
                 <div className="flex items-center space-x-4">
-                  <div className="flex-shrink-0">
-                    <img
-                      className="h-8 w-8 rounded-full"
-                      src={item.image_url}
-                      alt="Neil image"
-                    />
-                  </div>
+                  <Link href={`/community/${item.id}`}>
+                    <div className="flex-shrink-0">
+                      <img
+                        className="h-8 w-8 rounded-full"
+                        src={item.image_url}
+                        alt={item.name}
+                      />
+                    </div>
+                  </Link>
                   <div className="min-w-0 flex-1">
                     <p className="truncate text-sm font-medium text-gray-900 dark:text-white">
                       {item.name}

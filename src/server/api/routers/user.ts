@@ -261,9 +261,109 @@ export const userRouter = createTRPCRouter({
 
             return deletedComment;
         }),
+    togglePostToFavorites: protectedProcedure
+        .input(z.object({ id: z.string() }))
+        .mutation(async ({ ctx, input }) => {
+            const post = await ctx.prisma.post.findUnique({
+                where: {
+                    id: input.id,
+                },
+            });
 
+            if (!post) {
+                throw new Error("Post not found");
+            }
+
+            // check if user already favorited this post
+            const favorite = await ctx.prisma.postFavorite.findFirst({
+                where: {
+                    userId: ctx.session.user.id,
+                    postId: post.id,
+                },
+            });
+
+            if (favorite) {
+                // delete favorite
+                const deletedFavorite = await ctx.prisma.postFavorite.delete({
+                    where: {
+                        id: favorite.id,
+                    },
+                });
+
+                return deletedFavorite;
+            }
+
+            const newFavorite = await ctx.prisma.postFavorite.create({
+                data: {
+                    userId: ctx.session.user.id,
+                    postId: post.id,
+
+                },
+            });
+
+            return newFavorite;
+
+        }
+        ),
+    removePostFromFavorites: protectedProcedure
+        .input(z.object({ id: z.string() }))
+        .mutation(async ({ ctx, input }) => {
+            const post = await ctx.prisma.post.findUnique({
+                where: {
+                    id: input.id,
+                },
+            });
+
+            if (!post) {
+                throw new Error("Post not found");
+            }
+
+            const deletedFavorite = await ctx.prisma.postFavorite.deleteMany({
+                where: {
+                    userId: ctx.session.user.id,
+                    postId: post.id,
+                },
+            });
+
+            return deletedFavorite;
+
+        }
+        ),
+    getFavoritePosts: protectedProcedure.query(async ({ ctx }) => {
+        const posts = await ctx.prisma.post.findMany({
+            where: {
+                favorites: {
+                    some: {
+                        userId: ctx.session.user.id,
+
+                    },
+                },
+            },
+            include: {
+                community: {
+                    select: {
+                        id: true,
+                        name: true,
+                        image_url: true,
+                    },
+                },
+                user: {
+                    select: {
+                        name: true,
+                        id: true,
+                    },
+                },
+
+                _count: {
+                    select: {
+                        votes: true,
+                    },
+                },
+            },
+        });
+
+        return posts;
+    }
+    ),
 });
-
-
-
 

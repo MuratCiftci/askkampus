@@ -45,7 +45,7 @@ export const postRouter = createTRPCRouter({
         }
       }
 
-
+      console.log(ctx?.session?.user, "user");
 
       const { cursor } = input;
       const posts = await ctx.prisma.post.findMany({
@@ -68,16 +68,17 @@ export const postRouter = createTRPCRouter({
 
           favorites: {
             where: {
-              userId: ctx?.session?.user.id,
+              userId: ctx?.session?.user.id ?? "",
 
             },
             select: {
+              userId: true,
               postId: true,
             },
           },
           votes: {
             where: {
-              userId: ctx?.session?.user.id,
+              userId: ctx?.session?.user.id ?? "",
             },
             select: {
               postId: true,
@@ -168,7 +169,7 @@ export const postRouter = createTRPCRouter({
           // check if user has voted on this post
           votes: {
             where: {
-              userId: ctx?.session?.user.id,
+              userId: ctx?.session?.user.id ?? "",
             },
           },
 
@@ -452,7 +453,7 @@ export const postRouter = createTRPCRouter({
         });
       }
       else {
-     
+
         // eslint-disable-next-line @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-assignment
         await ctx.prisma.postVote.create({
           data: {
@@ -532,7 +533,7 @@ export const postRouter = createTRPCRouter({
           },
           favorites: {
             where: {
-              userId: ctx?.session?.user.id,
+              userId: ctx?.session?.user.id ?? "",
 
             },
             select: {
@@ -541,7 +542,7 @@ export const postRouter = createTRPCRouter({
           },
           votes: {
             where: {
-              userId: ctx?.session?.user.id,
+              userId: ctx?.session?.user.id ?? "",
             },
             select: {
               postId: true,

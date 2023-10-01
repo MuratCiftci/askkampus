@@ -13,6 +13,7 @@ import UpvoteFilled from "~/components/shared/icons/UpvoteFilled";
 import DownvoteFilled from "~/components/shared/icons/DownvoteFilled";
 import { type inferRouterOutputs } from "@trpc/server";
 import { type AppRouter } from "~/server/api/root";
+import { useSession } from "next-auth/react";
 
 type RouterOutput = inferRouterOutputs<AppRouter>;
 type Post = RouterOutput["post"]["getAllPosts"]["posts"][number];
@@ -24,6 +25,7 @@ type Props = {
 const PostCard = (props: Props) => {
   const { post } = props;
   // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+  const { data, status } = useSession();
 
   const [isFavorited, setIsFavorited] = React.useState(
     post.favorites?.length > 0
@@ -53,8 +55,12 @@ const PostCard = (props: Props) => {
 
   const addToFavorites = api.user.togglePostToFavorites.useMutation({
     onSuccess: () => {
-      toast({ title: isFavorited ? "Favorilerden çıkarıldı" : "Post favorilere eklendi" });
-      setIsFavorited(prev => !prev)
+      toast({
+        title: isFavorited
+          ? "Favorilerden çıkarıldı"
+          : "Post favorilere eklendi",
+      });
+      setIsFavorited((prev) => !prev);
     },
     onError: (err) => {
       toast({
@@ -67,6 +73,8 @@ const PostCard = (props: Props) => {
 
   const handleVoteStatus = (vote: "UPVOTE" | "DOWNVOTE" | "NONE") => {
     let voteChange = 0;
+
+  
 
     if (vote === "UPVOTE") {
       voteChange = isUpvoted ? -1 : isDownvoted ? 2 : 1;
@@ -88,6 +96,14 @@ const PostCard = (props: Props) => {
           <div
             className="m-0 cursor-pointer hover:bg-inherit hover:text-blue-500 dark:hover:bg-inherit dark:hover:text-blue-500"
             onClick={() => {
+              if (status !== "authenticated") {
+                toast({
+                  title: "Error",
+                  description: "Oy verebilmek için giriş yapmalısınız",
+                  variant: "destructive",
+                });
+                return;
+              }
               handleVoteStatus("UPVOTE");
               upvotePost.mutate({ postId: post.id, voteType: "UPVOTE" });
             }}
@@ -102,6 +118,14 @@ const PostCard = (props: Props) => {
 
           <div
             onClick={() => {
+              if (status !== "authenticated") {
+                toast({
+                  title: "Error",
+                  description: "Oy verebilmek için giriş yapmalısınız",
+                  variant: "destructive",
+                });
+                return;
+              }
               handleVoteStatus("DOWNVOTE");
               upvotePost.mutate({ postId: post.id, voteType: "DOWNVOTE" });
             }}
@@ -186,7 +210,12 @@ const PostCard = (props: Props) => {
               onClick={() => addToFavorites.mutate({ id: post.id })}
             >
               {isFavorited ? (
-                <Image src={"/images/heart.png"} width={16} height={16} alt="heart" />
+                <Image
+                  src={"/images/heart.png"}
+                  width={16}
+                  height={16}
+                  alt="heart"
+                />
               ) : (
                 <OutlinedFavorite />
               )}

@@ -37,7 +37,7 @@ const DayCard = ({ disabled, day, events, isToday, month, year }: Props) => {
 
   return (
     <td
-      className={`lg:w-30 md:w-30 ease h-40 w-10 cursor-pointer overflow-auto border p-1 duration-500 transition hover:bg-blue-100 sm:w-20 xl:w-40 ${
+      className={`lg:w-30 md:w-30 ease h-40 md:h-40 w-10 cursor-pointer overflow-auto border p-1 duration-500 transition hover:bg-blue-100 sm:w-20 xl:w-40 ${
         disabled ? "bg-gray-100" : ""
       }`}
       onClick={() => {
@@ -46,7 +46,7 @@ const DayCard = ({ disabled, day, events, isToday, month, year }: Props) => {
         }
       }}
     >
-      <div className="lg:w-30 md:w-30 mx-auto mx-auto flex h-40 w-10 flex-col overflow-hidden sm:w-full xl:w-30">
+      <div className="lg:w-30 md:w-30 mx-auto mx-auto flex h-40 md:h-40 w-10 flex-col overflow-hidden sm:w-full xl:w-30">
         <div className="top h-5 w-full">
           <span
             className={`text-sm text-gray-500 ${

@@ -175,7 +175,7 @@ const Sidebar = ({ children }: { children: React.ReactNode }) => {
         </div>
       </aside>
 
-      <div className="mt-24 px-8 sm:ml-48">
+      <div className="lg:mt-24 md:px-8 lg:ml-48">
         <div className="rounded-lg border-2 border-dashed border-gray-200 p-4 dark:border-gray-700">
           {children}
         </div>

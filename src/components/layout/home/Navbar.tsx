@@ -8,6 +8,9 @@ import { Button } from "~/components/shared/ui/Button";
 import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/router";
+import Close from "~/components/shared/ui/Close";
+import { BarChart3Icon } from "lucide-react";
+import HamburgerMenu from "~/components/shared/ui/HamburgerMenu";
 
 function classNames(...classes: string[]) {
   return classes.filter(Boolean).join(" ");
@@ -36,16 +39,12 @@ export default function Navbar() {
                 <Disclosure.Button className="relative inline-flex items-center justify-center rounded-md p-2 text-gray-400 hover:bg-gray-700 hover:text-white focus:outline-none focus:ring-2 focus:ring-inset focus:ring-white">
                   <span className="absolute -inset-0.5" />
                   <span className="sr-only">Open main menu</span>
-                  {/* {open ? (
-                    <XIcon className="block h-6 w-6" aria-hidden="true" />
-                  ) : (
-                    <BarChart3Icon className="block h-6 w-6" aria-hidden="true" />
-                  )} */}
+                  {open ? <Close /> : <HamburgerMenu />}
                 </Disclosure.Button>
               </div>
               <div className="flex flex-1 items-center justify-center sm:items-stretch sm:justify-start">
                 <div
-                  className="flex flex-shrink-0 items-center cursor-pointer"
+                  className="flex flex-shrink-0 cursor-pointer items-center"
                   onClick={() => void router.push("/")}
                 >
                   <img

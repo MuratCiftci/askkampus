@@ -61,7 +61,7 @@ const CommunityStatsCard = ({ id }: Props) => {
   }
 
   return (
-    <div className="min-w-3xl mt-12 flex w-1/4 items-start justify-center px-8">
+    <div className="min-w-3xl mt-12 flex sm:w-full md:w-1/4 items-start justify-center px-8">
       <div className="flex w-full flex-col items-center justify-center rounded-lg bg-white py-3 shadow-xl">
         <div className="photo-wrapper p-2">
           <img

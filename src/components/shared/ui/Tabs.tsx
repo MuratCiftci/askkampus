@@ -22,7 +22,7 @@ const Tabs = ({ tabs }: Props) => {
   };
   return (
     <div className="text-md border-b border-gray-200 text-center font-medium text-gray-500 dark:border-gray-700 dark:text-gray-400">
-      <ul className="-mb-px flex flex-wrap">
+      <ul className="-mb-px flex md:flex-wrap">
         {tabs.map((tab) => (
           <li className="mr-2" key={tab.key}>
             <Link

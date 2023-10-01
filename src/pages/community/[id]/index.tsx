@@ -78,7 +78,7 @@ const Community = () => {
   return (
     <div className="h-full w-full">
       <CommunityBanner community={communityBanner} />
-      <div className=" flex flex-row items-start justify-start dark:bg-gray-900">
+      <div className=" flex flex-col md:flex-row items-start justify-start dark:bg-gray-900">
         <div className=" bg-white-50 container flex flex-col items-center justify-center border-r border-gray-300 dark:border-gray-700 dark:bg-gray-900 mt-8">
           {posts?.length === 0 ? (
             <NoFound />

@@ -58,7 +58,7 @@ const EventCard = ({ event, type }: EventCardProps) => {
   });
 
   const isAttending = event.attendees.some(
-    (attendee) => attendee.id === data.user?.id
+    (attendee) => attendee.id === data?.user?.id
   );
 
   return (

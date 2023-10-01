@@ -8,7 +8,7 @@ interface Props {
 }
 
 const Comments = ({ comments }: Props) => {
-  const [commentDropdown, setCommentDropdown] = React.useState(false);
+ 
   const totalCommentsWithReplies = comments?.reduce(
     (acc, comment) => acc + (comment.replies ? comment.replies.length : 0) + 1,
     0

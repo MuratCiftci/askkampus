@@ -2,6 +2,11 @@ import React from "react";
 import { Comment } from "./index.type";
 import dayjs from "dayjs";
 import CommentArea from "./CommentArea";
+import { Modal } from "~/components/shared/ui/Modal";
+import { Button } from "~/components/shared/ui/Button";
+import { DeleteIcon, Trash, Trash2 } from "lucide-react";
+import { api } from "~/utils/api";
+import { toast } from "~/components/hooks/ui/use-toast";
 
 type Props = {
   comment: Comment;
@@ -10,7 +15,26 @@ type Props = {
 
 const CommentCard = ({ comment, isReply }: Props) => {
   const [openReplyArea, setOpenReplyArea] = React.useState(false);
-  const [commentDropdown, setCommentDropdown] = React.useState(false);
+  const [confirmDeleteModal, setConfirmDeleteModal] = React.useState(false);
+  const utils = api.useContext();
+  const deleteMutate = api.user.deleteComment.useMutation({
+    onSuccess: async () => {
+      toast({ title: "Yorum silindi" });
+      await utils.post.getComments.invalidate();
+    },
+    onError: (err) => {
+      toast({
+        title: "Error",
+        description: err.message,
+        variant: "destructive",
+      });
+    },
+  });
+  const handleDelete = () => {
+    // delete comment
+    deleteMutate.mutate({ id: comment.id });
+    setConfirmDeleteModal(false);
+  };
   return (
     <article className="rounded-lg bg-white pl-6 pt-6 pb-6 text-base dark:bg-gray-900 dark:text-white">
       <footer className="mb-2 flex items-center justify-between">
@@ -29,23 +53,13 @@ const CommentCard = ({ comment, isReply }: Props) => {
           </p>
         </div>
         <div className="position-relative flex flex-col items-center">
-          <button
-            id="dropdownComment1Button"
-            onClick={() => setCommentDropdown(!commentDropdown)}
-            className="inline-flex items-center rounded-lg bg-white p-2 text-center text-sm font-medium text-gray-500 hover:bg-gray-100 focus:outline-none focus:ring-4 focus:ring-gray-50 dark:bg-gray-900 dark:text-gray-400 dark:hover:bg-gray-700 dark:focus:ring-gray-600"
+          <Button
+            variant="ghost"
             type="button"
+            onClick={() => setConfirmDeleteModal(true)}
           >
-            <svg
-              className="h-4 w-4"
-              aria-hidden="true"
-              xmlns="http://www.w3.org/2000/svg"
-              fill="currentColor"
-              viewBox="0 0 16 3"
-            >
-              <path d="M2 0a1.5 1.5 0 1 1 0 3 1.5 1.5 0 0 1 0-3Zm6.041 0a1.5 1.5 0 1 1 0 3 1.5 1.5 0 0 1 0-3ZM14 0a1.5 1.5 0 1 1 0 3 1.5 1.5 0 0 1 0-3Z" />
-            </svg>
-            <span className="sr-only">Comment settings</span>
-          </button>
+            <Trash2 size={20} />
+          </Button>
         </div>
       </footer>
       <p className="text-gray-500 dark:text-gray-400">{comment.body}</p>
@@ -92,6 +106,13 @@ const CommentCard = ({ comment, isReply }: Props) => {
           />
         </>
       ))}
+
+      <Modal
+        handleOpen={() => setConfirmDeleteModal(true)}
+        handleClose={() =>  setConfirmDeleteModal(false)}
+        handleDelete={handleDelete}
+        open={confirmDeleteModal}
+      />
     </article>
   );
 };
